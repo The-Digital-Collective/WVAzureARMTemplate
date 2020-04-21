@@ -1,0 +1,75 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		 "trafficManagerName":{
+            "type":"string"
+        },
+       	"webSiteName":{
+            "type":"string"
+        },
+        "trafficeManagerEndPointPriority":{
+            "type":"int"
+        },
+       	"resourceGroupWebapp":{
+            "type":"string"
+        },
+        "webappEndpoint":{
+            "type":"string"
+        }
+	},
+	"variables": {
+		"profileStatus": "Enabled",
+		"trafficRoutingMethod": "Priority",
+		"ttl": "60",
+		"profileMonitorStatus": "Online",
+		"protocol": "HTTPS",
+		"port": "80",
+		"intervalInSeconds": "30",
+		"toleratedNumberOfFailures": "3",
+		"timeoutInSeconds": "10",
+		"subscriptionID": "[subscription().subscriptionId]"
+	},
+	"resources": [
+		 {
+        	"type": "Microsoft.Network/trafficManagerProfiles",
+            "apiVersion": "2018-04-01",
+            "name": "[parameters('trafficManagerName')]",
+            "location": "global",
+            "properties": {
+                "profileStatus": "[variables('profileStatus')]",
+                "trafficRoutingMethod": "[variables('trafficRoutingMethod')]",
+                "dnsConfig": {
+                    "relativeName": "[parameters('trafficManagerName')]",
+                    "ttl": "[variables('ttl')]"
+               	},
+                "monitorConfig": {
+                    "profileMonitorStatus": "[variables('profileMonitorStatus')]",
+                    "protocol": "[variables('protocol')]",
+                    "port": "[variables('port')]",
+                    "path": "/",
+                    "intervalInSeconds": "[variables('intervalInSeconds')]",
+                    "toleratedNumberOfFailures": "[variables('toleratedNumberOfFailures')]",
+                    "timeoutInSeconds": "[variables('timeoutInSeconds')]",
+                   "expectedStatusCodeRanges": [{"min":200,"max":202},{"min":407,"max":407}]
+                },
+                "endpoints": [
+                    {
+			            "name": "[parameters('webappEndpoint')]",
+			            "type": "Microsoft.Network/trafficManagerProfiles/azureEndpoints",
+			            "dependsOn": [
+					         "[concat('Microsoft.Network/trafficManagerProfiles/', parameters('trafficManagerName'))]",
+	        				 "[concat('Microsoft.Web/sites/', parameters('webSiteName'))]"
+					      ],
+			            "properties": {
+			              "targetResourceId": "[concat('/subscriptions/', variables('subscriptionID'), '/resourceGroups/', parameters('resourceGroupWebapp'),'/providers/Microsoft.Web/sites/', parameters('WebsiteName'))]",
+                          "target": "[concat(parameters('websiteName'), '.azurewebsites.net')]",
+			              "endpointStatus": "[variables('profileStatus')]",
+			              "priority": "[parameters('trafficeManagerEndPointPriority')]"
+			           	}
+			       }
+               	]
+            }
+        }
+	]
+}
