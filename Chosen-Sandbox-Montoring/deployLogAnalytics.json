@@ -1,0 +1,33 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "loganalytics_name": {
+        "type": "string"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.OperationalInsights/workspaces",
+            "apiVersion": "2015-11-01-preview",
+            "name": "[parameters('loganalytics_name')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                
+                "sku": {
+                    "name": "PerGB2018"
+                },
+                "retentionInDays": 30
+            }
+        }
+    ],
+    "outputs": {
+        "loganalyticsid":{
+            "type": "string",
+           "value": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('loganalytics_name'))]"
+        } 
+        
+        
+    }
+}

@@ -1,0 +1,183 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "alertName": {
+            "type": "string"
+        },
+        "alertDescription": {
+            "type": "string"     
+        },
+        "alertSeverity": {
+            "type": "int",
+            "defaultValue": 3,
+            "allowedValues": [
+                0,
+                1,
+                2,
+                3,
+                4
+            ],
+            "metadata": {
+                "description": "Severity of alert {0,1,2,3,4}"
+            }
+        },
+        "isEnabled": {
+            "type": "bool",
+            "defaultValue": true,
+            "metadata": {
+                "description": "Specifies whether the alert is enabled"
+            }
+        },
+        "actionGroupName" : {
+          "type": "string"
+        },
+  
+        "actionGroupShortName": {
+          "type": "string"
+         
+        },
+  
+        "metricName": {
+            "type": "string"
+        },
+        "operator": {
+            "type": "string",
+            "defaultValue": "GreaterThan",
+            "allowedValues": [
+                "Equals",
+                "NotEquals",
+                "GreaterThan",
+                "GreaterThanOrEqual",
+                "LessThan",
+                "LessThanOrEqual"
+            ],
+            "metadata": {
+                "description": "Operator comparing the current value with the threshold value."
+            }
+        },
+        "threshold": {
+            "type": "string",
+            "defaultValue": "70",
+            "metadata": {
+                "description": "The threshold value at which the alert is activated."
+            }
+        },
+        "timeAggregation": {
+            "type": "string",
+            "defaultValue": "Average",
+            "allowedValues": [
+                "Average",
+                "Minimum",
+                "Maximum",
+                "Total",
+                "Count"
+            ],
+            "metadata": {
+                "description": "How the data that is collected should be combined over time."
+            }
+        },
+        "resourceId": {
+          "type": "string",
+          "defaultValue": "[resourceId('Microsoft.Sql/servers/databases', parameters('sqlserverName'), parameters('databaseName'))]"
+          
+      },
+        "windowSize": {
+            "type": "string",
+            "defaultValue": "PT5M",
+            "allowedValues": [
+                "PT1M",
+                "PT5M",
+                "PT15M",
+                "PT30M",
+                "PT1H",
+                "PT6H",
+                "PT12H",
+                "PT24H"
+            ],
+            "metadata": {
+                "description": "Period of time used to monitor alert activity based on the threshold. Must be between one minute and one day. ISO 8601 duration format."
+            }
+        },
+        "evaluationFrequency": {
+            "type": "string",
+            "defaultValue": "PT1M",
+            "allowedValues": [
+                "PT1M",
+                "PT5M",
+                "PT15M",
+                "PT30M",
+                "PT1H"
+            ],
+            "metadata": {
+                "description": "how often the metric alert is evaluated represented in ISO 8601 duration format"
+            }
+        }
+  
+  
+    },
+    "variables": { 
+        "customEmails" : "jana.julakanti@worldvision.org.uk"
+     },
+    "resources": [
+        {
+            "comments": "create alerts action group",
+            "type": "Microsoft.Insights/actionGroups",
+            "apiVersion": "2018-03-01",
+            "name": "[parameters('actionGroupName')]",
+            "location": "Global",
+            "properties": {
+              "groupShortName": "[parameters('actionGroupShortName')]",
+              "enabled": true,
+              
+              "emailReceivers": [
+                {
+                  "name": "devopseng1",
+                  "emailAddress": "jana.julakanti@worldvision.org.uk"
+                },
+                {
+                  "name": "devopseng2",
+                  "emailAddress": "venkatesh.anbazhagan@worldvision.org.uk"
+                }
+              ]
+            }
+        },
+        {
+            "comments": "sql db cpu utilization alert",
+            "name": "[parameters('alertName')]",
+            "type": "Microsoft.Insights/metricAlerts",
+            "location": "global",
+            "apiVersion": "2018-03-01",
+            "tags": {},
+            "properties": {
+                "description": "[parameters('alertDescription')]",
+                "severity": "[parameters('alertSeverity')]",
+                "enabled": "[parameters('isEnabled')]",
+                "scopes": ["[parameters('resourceId')]"],
+                "evaluationFrequency":"[parameters('evaluationFrequency')]",
+                "windowSize": "[parameters('windowSize')]",
+                "criteria": {
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+                    "allOf": [
+                        {
+                            "name" : "1st criterion",
+                            "metricName": "[parameters('metricName')]",
+                            "criterionType": "StaticThresholdCriterion",
+                            "dimensions":[],
+                            "operator": "[parameters('operator')]",
+                            "threshold" : "[parameters('threshold')]",
+                            "timeAggregation": "[parameters('timeAggregation')]"
+                        }
+                    ]
+                },
+                "actions": [
+                  {
+                      "actionGroupId": "[resourceId('Microsoft.Insights/actionGroups',parameters('actionGroupName'))]"
+                  }
+              ]
+            }
+          }
+          
+          ]
+  
+  }

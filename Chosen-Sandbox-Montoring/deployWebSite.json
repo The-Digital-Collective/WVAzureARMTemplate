@@ -1,0 +1,216 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"hostingPlanName": {
+			"type": "string"
+		},
+		"webSiteName": {
+			"type": "string"
+		},
+		"sqlserverName": {
+			"type": "string"
+		},
+		"administratorLogin": {
+			"type": "string"
+		},
+		"administratorLoginPassword": {
+			"type": "securestring"
+		},
+		"databaseName": {
+			"type": "string"
+		},
+		"ida:AADInstance": {
+			"type": "string"
+		},
+		"ida:ClientId": {
+			"type": "string"
+		},
+		"ida:Domain": {
+			"type": "string"
+		},
+		"ida:PostLogoutRedirectUri": {
+			"type": "string"
+		},
+		"ida:BankValidatorURL": {
+			"type": "string"
+		},
+		"ida:BankValidatorKey": {
+			"type": "string"
+		},
+		"outputHostingPlanReference": {
+			"type": "string"
+		},
+		"outputStorageAccountNameReference": {
+			"type": "string"
+		},
+		"outputStorageContainerNameReference": {
+			"type": "string"
+		},
+		"outputStorageAccountKeyReference": {
+			"type": "string"
+		},
+		"AppInsightsInstrumentationKey":{
+			"type": "string"
+		},
+		"containerAppLogs": {
+			"type": "string",
+			"metadata": {
+				"description": "Specifies the name of the blob container."
+			}
+		},
+		"containerWebLogs": {
+			"type": "string",
+			"metadata": {
+				"description": "Specifies the name of the blob container."
+			}
+		}
+    },
+    "variables": {
+		"publishingUsername":"[concat('$',parameters('webSiteName'))]",
+		
+		"diagnosticsLogsRetentionInDays":"30"
+		
+    
+	},
+	
+
+	"resources": [
+		{
+			"apiVersion": "2018-11-01",
+			"name": "[parameters('webSiteName')]",
+			"type": "Microsoft.Web/sites",
+			"location": "[resourceGroup().location]",
+			"dependsOn": [],
+			"tags": {
+				"[concat('hidden-related:', resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('hostingPlanName'))]": "empty",
+				"displayName": "Website"
+            },
+            "kind": "app",
+			"properties": {
+				"name": "[parameters('webSiteName')]",
+				"serverFarmId": "[parameters('outputHostingPlanReference')]"
+			},
+			"resources": [
+				{
+					"apiVersion": "2015-08-01",
+					"type": "config",
+					"name": "connectionstrings",
+					"dependsOn": [
+						"[resourceId('Microsoft.Web/Sites/', parameters('webSiteName'))]"
+					],
+					"properties": {
+						"WebAppContext": {
+							"value": "[concat('Data Source=tcp:', parameters('sqlserverName'),'.database.windows.net', ',1433;Initial Catalog=', parameters('databaseName'), ';User Id=', parameters('administratorLogin'), '@', parameters('sqlserverName'), ';Password=', parameters('administratorLoginPassword'), ';')]",
+							"type": "SQLAzure"
+						}
+					}
+                },
+                {
+                    "name": "appsettings",
+                    "type": "config",
+                    "apiVersion": "2015-08-01",
+                    "dependsOn": [
+                        "[resourceId('Microsoft.Web/Sites/', parameters('webSiteName'))]"
+                    ],
+                    "properties": {
+                        "ida:AADInstance": "[parameters('ida:AADInstance')]",
+                        "ida:ClientId": "[parameters('ida:ClientId')]",
+                        "ida:Domain": "[parameters('ida:Domain')]",
+                        "ida:PostLogoutRedirectUri": "[parameters('ida:PostLogoutRedirectUri')]",
+                        "ida:TenantId": "[subscription().tenantId]",
+                        "ida:BankValidatorURL": "[parameters('ida:BankValidatorURL')]",
+                        "ida:BankValidatorKey": "[parameters('ida:BankValidatorKey')]",
+                        "StorageAccountName": "[parameters('outputStorageAccountNameReference')]",
+                        "StorageContainer": "[parameters('outputStorageContainerNameReference')]",
+                        "StorageAccountKey": "[parameters('outputStorageAccountKeyReference')]",
+                        "AppInsights_InstrumentationKey":"[parameters('AppInsightsInstrumentationKey')]",
+                        "ApplicationInsights_connecion_string":"[concat('InstrumentationKey=',parameters('AppInsightsInstrumentationKey'))]",
+                        "ApplicationInsightsAgent_extention_version": "~2",
+						"XDT_MicrosoftApplicationInsights_Mode": "default",
+						
+						"DIAGNOSTICS_AZUREBLOBRETENTIONINDAYS": "30",
+						
+						"WEBSITE_HTTPLOGGING_RETENTION_DAYS":"30"
+                        
+                    }
+                    
+                },
+                {
+                    "apiVersion": "2018-02-01",
+                    "type": "config",
+                    "name": "logs",
+                    "dependsOn": [
+                      "[concat('Microsoft.Web/sites/', parameters('webSiteName'))]"
+                    ],
+                    "properties": {
+						"applicationLogs": {
+						"azureBlobStorage": {
+						 "sasUrl": "https://chosensandboxmlstorage.blob.core.windows.net/?sv=2019-02-02&ss=bfqt&srt=sco&sp=rwdlacup&se=2020-04-16T16:48:56Z&st=2020-04-16T08:48:56Z&spr=https&sig=mkoF1vR0mr%2F7Kt3q7mvaGmz80%2FgvEkRh3O%2B8BiMbf%2Fg%3D",
+						  "level": "Information",
+						  "retentionInDays": 15
+						}
+					  },
+					 
+                   
+					"webServerLogs":true,
+                      
+                      "requestTracingEnabled": true,
+                      "requestTracingExpirationTime": "9999-12-31T23:59:00Z",
+                      "remoteDebuggingEnabled": false,
+                      "httpLoggingEnabled": true,
+                      "logsDirectorySizeLimit": 34,
+                      "detailedErrorLoggingEnabled": true,
+					   "Failedrequesttracing": true,
+                      "netFrameworkVersion": "v4.0",
+                      "phpVersion": "5.6",
+                      "publishingUsername": "[variables('publishingUsername')])",
+                        "scmType": "VSTSRM",
+                        "use32BitWorkerProcess": true,
+                        "webSocketsEnabled": false,
+                        "alwaysOn": false,
+                        "managedPipelineMode": "Integrated",
+                        "virtualApplications": [
+                            {
+                                "virtualPath": "/",
+                                "physicalPath": "site\\wwwroot",
+                                "preloadEnabled": false
+                            }
+                        ],
+                        "loadBalancing": "LeastRequests",
+                        "experiments": {
+                            "rampUpRules": []
+                        },
+                        "autoHealEnabled": false,
+                        "localMySqlEnabled": false,
+                        "ipSecurityRestrictions": [
+                            {
+                                "ipAddress": "Any",
+                                "action": "Allow",
+                                "priority": 1,
+                                "name": "Allow all",
+                                "description": "Allow all access"
+                            }
+                        ],
+                        "scmIpSecurityRestrictions": [
+                            {
+                                "ipAddress": "Any",
+                                "action": "Allow",
+                                "priority": 1,
+                                "name": "Allow all",
+                                "description": "Allow all access"
+                            }
+                        ],
+                        "scmIpSecurityRestrictionsUseMain": false,
+                        "http20Enabled": false,
+                        "minTlsVersion": "1.2",
+                        "ftpsState": "AllAllowed",
+                        "reservedInstanceCount": 0
+                    }
+                }
+            ]
+        }
+                
+
+    ]
+}
