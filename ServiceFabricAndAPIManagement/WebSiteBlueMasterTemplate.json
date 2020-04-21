@@ -81,7 +81,7 @@
 		}
 	},
 	"variables": {
-		"baseTemplateUrl": "https://storageworldvision.blob.core.windows.net/staging-temp-clean",
+		"baseTemplateUrl": "https://raw.githubusercontent.com/The-Digital-Collective/WVAzureARMTemplate/master/ServiceFabricAndAPIManagement/child",
 		"nestedSQLServerTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'deploySqlServer.json')]",
 		"nestedHostingPlanTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'deployHostingPlan.json')]",
 		"nestedStorageAccountTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'deployStorageAccount.json')]",
