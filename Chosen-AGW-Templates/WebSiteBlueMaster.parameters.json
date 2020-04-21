@@ -1,0 +1,70 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"administratorLogin": {
+			"reference": {
+				"keyVault": {
+					"id": "/subscriptions/b39db650-2ae6-4e43-98cd-2a21da688c6f/resourceGroups/KeyVault-RG/providers/Microsoft.KeyVault/vaults/KeyVault-WVUK"
+				},
+				"secretName": "Login-Chosen-Staging-Secret"
+			}
+		},
+		"administratorLoginPassword": {
+			"reference": {
+				"keyVault": {
+					"id": "/subscriptions/b39db650-2ae6-4e43-98cd-2a21da688c6f/resourceGroups/KeyVault-RG/providers/Microsoft.KeyVault/vaults/KeyVault-WVUK"
+				},
+				"secretName": "PWD-Chosen-Staging-Secret"
+			}
+		},
+		"ida:AADInstance": {
+			"reference": {
+				"keyVault": {
+					"id": "/subscriptions/b39db650-2ae6-4e43-98cd-2a21da688c6f/resourceGroups/KeyVault-RG/providers/Microsoft.KeyVault/vaults/KeyVault-WVUK"
+				},
+				"secretName": "Common-AADInstance-Digital-Collective"
+			}
+		},
+		"ida:ClientId": {
+			"reference": {
+				"keyVault": {
+					"id": "/subscriptions/b39db650-2ae6-4e43-98cd-2a21da688c6f/resourceGroups/KeyVault-RG/providers/Microsoft.KeyVault/vaults/KeyVault-WVUK"
+				},
+				"secretName": "Common-ClientId-Digital-Collective"
+			}
+		},
+		"ida:Domain": {
+			"reference": {
+				"keyVault": {
+					"id": "/subscriptions/b39db650-2ae6-4e43-98cd-2a21da688c6f/resourceGroups/KeyVault-RG/providers/Microsoft.KeyVault/vaults/KeyVault-WVUK"
+				},
+				"secretName": "Common-Domain-MS"
+			}
+		},
+		"ida:BankValidatorURL": {
+			"reference": {
+				"keyVault": {
+					"id": "/subscriptions/b39db650-2ae6-4e43-98cd-2a21da688c6f/resourceGroups/KeyVault-RG/providers/Microsoft.KeyVault/vaults/KeyVault-WVUK"
+				},
+				"secretName": "Common-BankValidatorURL-Digital-Collective"
+			}
+		},
+		"ida:BankValidatorKey": {
+			"reference": {
+				"keyVault": {
+					"id": "/subscriptions/b39db650-2ae6-4e43-98cd-2a21da688c6f/resourceGroups/KeyVault-RG/providers/Microsoft.KeyVault/vaults/KeyVault-WVUK"
+				},
+				"secretName": "Common-BankValidatorKey-Digital-Collective"
+			}
+		},
+		"environmentName": {
+			"value": "chosen-staging-poc"
+		},
+		"databaseName": {
+			"value": "chosenstagingagwdb"
+		}
+		
+		
+        	}
+}

@@ -1,0 +1,295 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"administratorLogin": {
+			"type": "string"
+		},
+		"administratorLoginPassword": {
+			"type": "securestring"
+		},
+		"ida:AADInstance": {
+			"type": "string"
+		},
+		"ida:ClientId": {
+			"type": "string"
+		},
+		"ida:Domain": {
+			"type": "string"
+		},
+		"ida:BankValidatorURL": {
+			"type": "string"
+		},
+		"ida:BankValidatorKey": {
+			"type": "string"
+		},
+		"environmentName": {
+			"type": "string"
+		},
+		"databaseName": {
+			"type": "string"
+		}
+		
+	
+		
+	},
+	"variables": {
+		"baseTemplateUrl": "https://storageworldvision.blob.core.windows.net/chosen-agwconnectiondraining",
+		"nestedSQLServerTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'deploySqlServer.json?token=AOHXSXGR2SIF2A4G2HXL24K6L5KFA')]",
+		"nestedHostingPlanTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'deployHostingPlan.json?token=AOHXSXGVWE5F5VJY4X266TC6L5KIA')]",
+		"nestedStorageAccountTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'deployStorageAccount.json?token=AOHXSXGPWRULAHQH2CBP2326L5KLW')]",
+		"nestedWebSiteTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'deployWebSite.json?token=AOHXSXEFUZHIRXW3HTTHMN26L5KNY')]",
+		"nestedApplicationGatewayTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'deployApplicationgateway.json?token=AOHXSXCG7JMIF6L2IXH54HC6L5KPK')]",
+		"apiVersion": "2017-05-10",
+		"contentVersion": "1.0.0.0",
+		"mode": "Incremental",
+		"sqlserverName": "[concat(parameters('environmentName'), '-sql-server')]",
+		"hostingPlanName": "[concat(parameters('environmentName'), '-hosting-plan-blue')]",
+		"webSiteName": "[concat(parameters('environmentName'), '-webapp-blue')]",
+		"applicationGatewayname": "[concat(parameters('environmentName'), '-AGW')]",
+		"virtualNetworkName": "[concat(parameters('environmentName'), '-Vnet')]",
+		"publicIPAddressName": "[concat(parameters('environmentName'), '-PIP')]",
+		"resourceGroupWebapp": "[concat(parameters('environmentName'), '-Green-RG')]",
+		"resourceGroupShared": "[concat(parameters('environmentName'), '-Shared-RG')]",
+		"storageenv":"[replace(parameters('environmentName'), '-', '')]",
+		"storageAccountName": "[concat(variables('storageenv'), 'storage')]",
+		"containerName": "[concat(parameters('environmentName'), '-photo-container')]",
+		"ida:PostLogoutRedirectUri": "[concat('https://', variables('webSiteName'),'.azurewebsites.net')]",
+		"sqlServerTemplate": "sqlServerTemplate",
+		"hostingPlanTemplate": "hostingPlanTemplate",
+		"storageAccountTemplate": "storageAccountTemplate",
+		"webSiteTemplate": "webSiteTemplate",
+		"applicationGatewayTemplate": "applicationGatewayTemplate",
+		"backendAddressPools":"[concat(parameters('environmentName'), '-Green')]",
+		"httpListeners":"[concat(parameters('environmentName'), '-Green')]",
+		"requestRoutingRules":"[concat(parameters('environmentName'), '-Green')]",
+		"backendHttpSettingsCollection":"[concat(parameters('environmentName'), '-Green')]",
+		"tier":"Standard_v2",
+		"skuSize":"Standard_v2",
+		"bluefqdn":"chosen-staging-agw-webapp-blue.azurewebsites.net",
+		"greenfqdn":"chosen-staging-agw-webapp-green.azurewebsites.net"
+	},
+	"resources": [
+		{
+			"apiVersion": "[variables('apiVersion')]",
+			"resourceGroup": "[variables('resourceGroupShared')]",
+			"name": "[variables('sqlServerTemplate')]",
+			"type": "Microsoft.Resources/deployments",
+			"properties": {
+				"mode": "[variables('mode')]",
+				"templateLink": {
+					"uri": "[variables('nestedSQLServerTemplateFile')]",
+					"contentVersion": "[variables('contentVersion')]"
+				},
+				"parameters": {
+					"administratorLogin": {
+						"value": "[parameters('administratorLogin')]"
+					},
+					"administratorLoginPassword": {
+						"value": "[parameters('administratorLoginPassword')]"
+					},
+					"sqlserverName": {
+						"value": "[variables('sqlserverName')]"
+					},
+					"databaseName": {
+						"value": "[parameters('databaseName')]"
+					}
+				}
+			}
+		},
+		{
+			"apiVersion": "[variables('apiVersion')]",
+			"resourceGroup": "[variables('resourceGroupWebapp')]",
+			"name": "[variables('hostingPlanTemplate')]",
+			"type": "Microsoft.Resources/deployments",
+			"properties": {
+				"mode": "[variables('mode')]",
+				"templateLink": {
+					"uri": "[variables('nestedHostingPlanTemplateFile')]",
+					"contentVersion": "[variables('contentVersion')]"
+				},
+				"parameters": {
+					"hostingPlanName": {
+						"value": "[variables('hostingPlanName')]"
+					}
+				}
+			}
+		},
+		{
+			"apiVersion": "[variables('apiVersion')]",
+			"resourceGroup": "[variables('resourceGroupShared')]",
+			"name": "[variables('storageAccountTemplate')]",
+			"type": "Microsoft.Resources/deployments",
+			"properties": {
+				"mode": "[variables('mode')]",
+				"templateLink": {
+					"uri": "[variables('nestedStorageAccountTemplateFile')]",
+					"contentVersion": "[variables('contentVersion')]"
+				},
+				"parameters": {
+					"storageAccountName": {
+						"value": "[variables('storageAccountName')]"
+					},
+					"containerName": {
+						"value": "[variables('containerName')]"
+					}
+				}
+			}
+		},
+		{
+			"apiVersion": "[variables('apiVersion')]",
+			"resourceGroup": "[variables('resourceGroupWebapp')]",
+			"name": "[variables('webSiteTemplate')]",
+			"type": "Microsoft.Resources/deployments",
+			"dependsOn": [
+				"[variables('hostingPlanTemplate')]",
+				"[variables('sqlServerTemplate')]",
+				"[variables('storageAccountTemplate')]"
+			],
+			"properties": {
+				"mode": "[variables('mode')]",
+				"templateLink": {
+					"uri": "[variables('nestedWebSiteTemplateFile')]",
+					"contentVersion": "[variables('contentVersion')]"
+				},
+				"parameters": {
+					"administratorLogin": {
+						"value": "[parameters('administratorLogin')]"
+					},
+					"administratorLoginPassword": {
+						"value": "[parameters('administratorLoginPassword')]"
+					},
+					"ida:AADInstance": {
+						"value": "[parameters('ida:AADInstance')]"
+					},
+					"ida:ClientId": {
+						"value": "[parameters('ida:ClientId')]"
+					},
+					"ida:Domain": {
+						"value": "[parameters('ida:Domain')]"
+					},
+					"ida:PostLogoutRedirectUri": {
+						"value": "[variables('ida:PostLogoutRedirectUri')]"
+					},
+					"ida:BankValidatorURL": {
+						"value": "[parameters('ida:BankValidatorURL')]"
+					},
+					"ida:BankValidatorKey": {
+						"value": "[parameters('ida:BankValidatorKey')]"
+					},
+					"sqlserverName": {
+						"value": "[variables('sqlserverName')]"
+					},
+					"databaseName": {
+						"value": "[parameters('databaseName')]"
+					},
+					"hostingPlanName": {
+						"value": "[variables('hostingPlanName')]"
+					},
+					"webSiteName": {
+						"value": "[variables('webSiteName')]"
+					},
+					"outputHostingPlanReference": {
+						"value": "[reference(variables('hostingPlanTemplate')).outputs.outputHostingPlanReference.value]"
+					},
+					"outputStorageAccountNameReference": {
+						"value": "[reference(variables('storageAccountTemplate')).outputs.outputStorageAccountNameReference.value]"
+					},
+					"outputStorageContainerNameReference": {
+						"value": "[reference(variables('storageAccountTemplate')).outputs.outputStorageContainerNameReference.value]"
+					},
+					"outputStorageAccountKeyReference": {
+						"value": "[reference(variables('storageAccountTemplate')).outputs.outputStorageAccountKeyReference.value]"
+					}
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "[variables('apiVersion')]",
+			"resourceGroup": "[variables('resourceGroupShared')]",
+			"name": "[variables('applicationGatewayTemplate')]",
+			"dependsOn": [
+				"[variables('sqlServerTemplate')]",
+				"[variables('hostingPlanTemplate')]",
+				"[variables('storageAccountTemplate')]",
+				"[variables('webSiteTemplate')]"
+			],
+			"properties": {
+				"mode": "[variables('mode')]",
+				"templateLink": {
+					"uri": "[variables('nestedApplicationGatewayTemplateFile')]",
+					"contentVersion": "[variables('contentVersion')]"
+				},
+				"parameters": {
+				
+				"webSiteName":{
+					"value":"[variables('webSiteName')]"
+				},
+				"subnetName":{
+					"value":"[parameters('environmentName')]"
+				},
+				"backendHttpSettingsCollection":{
+                     "value":"[variables('backendHttpSettingsCollection')]"
+        		},
+
+				"resourceGroupShared":{
+					"value":"[variables('resourceGroupShared')]"
+				},
+				"applicationGatewayName": {
+					"value": "[variables('applicationGatewayName')]"
+				},
+				"tier": {
+					"value": "[variables('tier')]"
+				},
+				"skuSize": {
+					"value": "[variables('skuSize')]"
+				},
+				"capacity": {
+					"value": 2
+				},
+				
+				
+			
+				"virtualNetworkName": {
+					"value": "[variables('virtualNetworkName')]"
+				},
+				"virtualNetworkPrefix": {
+					"value": [
+						"10.1.0.0/16"
+					]
+				},
+					"zones": {
+					"value": []
+				},
+				"publicIpZones": {
+					"value": []
+				},
+				"publicIpAddressName": {
+					"value": "[variables('publicIPAddressName')]"
+				},
+				"backendAddressPools":{
+					"value":"[variables('backendAddressPools')]"
+				},
+				"httpListeners":{
+					"value":"[variables('httpListeners')]"
+				},
+				"requestRoutingRules":{
+					"value":"[variables('requestRoutingRules')]"
+				},
+				"bluefqdn":{
+					"value":"[variables('bluefqdn')]"
+
+				},
+				"greenfqdn":{
+					"value":"[variables('bluefqdn')]"
+
+				}
+        		
+
+				
+				}
+			}
+		}
+	]
+}
