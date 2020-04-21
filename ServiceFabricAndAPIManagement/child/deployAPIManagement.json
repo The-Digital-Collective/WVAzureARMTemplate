@@ -1,0 +1,255 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"publisherEmail": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "The email address of the owner of the service"
+			}
+		},
+		"publisherName": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "The name of the owner of the service"
+			}
+		},
+		"sku": {
+			"type": "string",
+			"allowedValues": [
+				"Developer",
+				"Standard",
+				"Premium"
+			],
+			"defaultValue": "Standard",
+			"metadata": {
+				"description": "The pricing tier of this API Management service"
+			}
+		},
+		"skuCount": {
+			"type": "int",
+			"defaultValue": 1,
+			"metadata": {
+				"description": "The instance size of this API Management service."
+			}
+		},
+		"openIdConnectClientSecret": {
+			"type": "securestring",
+			"metadata": {
+				"description": "OpenId connect client secret."
+			}
+		},
+		"location": {
+			"type": "string",
+			"defaultValue": "[resourceGroup().location]",
+			"metadata": {
+				"description": "Location for all resources."
+			}
+		}
+	},
+	"variables": {
+		"apiManagementServiceName": "[concat('apimgmtservicetemplate', uniqueString(resourceGroup().id))]",
+		"serviceUrl": "https://example.net",
+		"apiName": "sampleApi",
+		"apiPath": "sampleapipath",
+		"OpenIdConnectProviderName": "sampleOpenIdConnectProvider",
+		"metadataEndpoint": "https://login.microsoftonline.com/organizations/v2.0/.well-known/openid-configuration",
+		"clientId": "a2efeed1-7ee2-484e-a606-70871eb27cba",
+		"operationName": "GET",
+		"productName": "sampleProduct",
+		"userName": "sampleUser",
+		"userFirstName": "sampleFirstName",
+		"userLastName": "sampleLastName",
+		"userEmail": "sample@testexample.com",
+		"groupName": "sampleGroup",
+		"subscriptionName": "sampleSubscription"
+	},
+	"resources": [
+		{
+			"apiVersion": "2017-03-01",
+			"name": "[variables('apiManagementServiceName')]",
+			"type": "Microsoft.ApiManagement/service",
+			"location": "[parameters('location')]",
+			"tags": {
+				
+			},
+			"sku": {
+				"name": "[parameters('sku')]",
+				"capacity": "[parameters('skuCount')]"
+			},
+			"properties": {
+				"publisherEmail": "[parameters('publisherEmail')]",
+				"publisherName": "[parameters('publisherName')]"
+			},
+			"resources": [
+				{
+					"apiVersion": "2017-03-01",
+					"type": "openidConnectProviders",
+					"name": "[variables('OpenIdConnectProviderName')]",
+					"dependsOn": [
+						"[concat('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'))]"
+					],
+					"properties": {
+						"displayName": "[variables('OpenIdConnectProviderName')]",
+						"description": "Description for example OpenId Connect provider",
+						"metadataEndpoint": "[variables('metadataEndpoint')]",
+						"clientId": "[variables('clientId')]",
+						"clientSecret": "[parameters('openIdConnectClientSecret')]"
+					}
+				},
+				{
+					"apiVersion": "2017-03-01",
+					"type": "apis",
+					"name": "[variables('apiName')]",
+					"dependsOn": [
+						"[concat('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'))]",
+						"[concat('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'),'/openidConnectProviders/',variables('OpenIdConnectProviderName'))]"
+					],
+					"properties": {
+						"displayName": "[variables('apiName')]",
+						"description": "Description for example API",
+						"serviceUrl": "[variables('serviceUrl')]",
+						"path": "[variables('apiPath')]",
+						"protocols": [
+							"HTTPS"
+						],
+						"authenticationSettings": {
+							"openid": {
+								"openidProviderId": "[variables('OpenIdConnectProviderName')]",
+								"bearerTokenSendingMethods": [
+									"authorizationHeader"
+								]
+							}
+						}
+					},
+					"resources": [
+						{
+							"apiVersion": "2017-03-01",
+							"type": "operations",
+							"name": "[variables('operationName')]",
+							"dependsOn": [
+								"[concat('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'), '/apis/',variables('apiName'))]"
+							],
+							"properties": {
+								"displayName": "GET resource",
+								"method": "[variables('operationName')]",
+								"urlTemplate": "/resource",
+								"description": "A demonstration of a GET call"
+							},
+							"resources": [
+								{
+									"apiVersion": "2017-03-01",
+									"type": "policies",
+									"name": "policy",
+									"dependsOn": [
+										"[concat('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'))]",
+										"[concat('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'), '/apis/',variables('apiName'))]",
+										"[concat('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'), '/apis/',variables('apiName'),'/operations/',variables('operationName'))]"
+									],
+									"properties": {
+										"policyContent": "<policies>\r\n  <inbound>\r\n  <validate-jwt header-name=\"Authorization\">\r\n      <openid-config url=\"https://login.microsoftonline.com/cfb22647-037f-43b0-b5b3-5e44e1aece7f/v2.0/.well-known/openid-configuration\" />\r\n      <required-claims>\r\n        <claim name=\"aud\">\r\n          <value>a2efeed1-7ee2-484e-a606-70871eb27cba</value>\r\n        </claim>\r\n      </required-claims>\r\n    </validate-jwt>\r\n  <base />\r\n  </inbound>\r\n  <backend>\r\n    <base />\r\n  </backend>\r\n  <outbound>\r\n    <base />\r\n  </outbound>\r\n  <on-error>\r\n    <base />\r\n  </on-error>\r\n</policies>"
+									}
+								}
+							]
+						}
+					]
+				},
+				{
+					"apiVersion": "2017-03-01",
+					"type": "products",
+					"name": "[variables('productName')]",
+					"dependsOn": [
+						"[concat('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'))]"
+					],
+					"properties": {
+						"displayName": "[variables('productName')]",
+						"description": "Description for example product",
+						"terms": "Terms for example product",
+						"subscriptionRequired": true,
+						"approvalRequired": false,
+						"subscriptionsLimit": 1,
+						"state": "published"
+					},
+					"resources": [
+						{
+							"apiVersion": "2017-03-01",
+							"type": "apis",
+							"name": "[variables('apiName')]",
+							"dependsOn": [
+								"[concat('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'))]",
+								"[concat('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'), '/apis/',variables('apiName'))]",
+								"[concat('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'), '/products/',variables('productName'))]"
+							]
+						},
+						{
+							"apiVersion": "2017-03-01",
+							"type": "policies",
+							"name": "policy",
+							"dependsOn": [
+								"[concat('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'))]",
+								"[concat('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'), '/products/',variables('productName'))]"
+							],
+							"properties": {
+								"policyContent": "<policies>\r\n  <inbound>\r\n  <validate-jwt header-name=\"Authorization\">\r\n      <openid-config url=\"https://login.microsoftonline.com/cfb22647-037f-43b0-b5b3-5e44e1aece7f/v2.0/.well-known/openid-configuration\" />\r\n      <required-claims>\r\n        <claim name=\"aud\">\r\n          <value>a2efeed1-7ee2-484e-a606-70871eb27cba</value>\r\n        </claim>\r\n      </required-claims>\r\n    </validate-jwt>\r\n  <base />\r\n  </inbound>\r\n  <backend>\r\n    <base />\r\n  </backend>\r\n  <outbound>\r\n    <base />\r\n  </outbound>\r\n  <on-error>\r\n    <base />\r\n  </on-error>\r\n</policies>"
+							}
+						}
+					]
+				},
+				{
+					"apiVersion": "2017-03-01",
+					"type": "users",
+					"name": "[variables('userName')]",
+					"dependsOn": [
+						"[concat('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'))]"
+					],
+					"properties": {
+						"firstName": "[variables('userFirstName')]",
+						"lastName": "[variables('userLastName')]",
+						"email": "[variables('userEmail')]",
+						"state": "active",
+						"note": "note for example user "
+					}
+				},
+				{
+					"apiVersion": "2017-03-01",
+					"type": "groups",
+					"name": "[variables('groupName')]",
+					"dependsOn": [
+						"[concat('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'))]"
+					],
+					"properties": {
+						"displayName": "[variables('groupName')]",
+						"description": "Example group description"
+					},
+					"resources": [
+						{
+							"apiVersion": "2017-03-01",
+							"type": "users",
+							"name": "[variables('userName')]",
+							"dependsOn": [
+								"[concat('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'))]",
+								"[concat('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'), '/groups/',variables('groupName'))]"
+							]
+						}
+					]
+				},
+				{
+					"apiVersion": "2017-03-01",
+					"type": "subscriptions",
+					"name": "[variables('subscriptionName')]",
+					"dependsOn": [
+						"[concat('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'))]",
+						"[concat('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'), '/products/',variables('productName'))]",
+						"[concat('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'), '/users/',variables('userName'))]"
+					],
+					"properties": {
+						"productId": "[concat('/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/', variables('apiManagementServiceName'),'/products/',variables('productName'))]",
+						"userId": "[concat('/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/', variables('apiManagementServiceName'),'/users/',variables('userName'))]"
+					}
+				}
+			]
+		}
+	]
+}

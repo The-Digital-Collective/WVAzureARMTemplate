@@ -1,0 +1,340 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"administratorLogin": {
+			"type": "string"
+		},
+		"administratorLoginPassword": {
+			"type": "securestring"
+		},
+		"ida:AADInstance": {
+			"type": "string"
+		},
+		"ida:ClientId": {
+			"type": "string"
+		},
+		"ida:Domain": {
+			"type": "string"
+		},
+		"ida:BankValidatorURL": {
+			"type": "string"
+		},
+		"ida:BankValidatorKey": {
+			"type": "string"
+		},
+		"environmentName": {
+			"type": "string"
+		},
+		"databaseName": {
+			"type": "string"
+		},
+		"publisherEmail": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "The email address of the owner of the service"
+			}
+		},
+		"publisherName": {
+			"type": "string",
+			"minLength": 1,
+			"metadata": {
+				"description": "The name of the owner of the service"
+			}
+		},
+		"openIdConnectClientSecret": {
+			"type": "securestring",
+			"metadata": {
+				"description": "OpenId connect client secret."
+			}
+		},
+		"clusterName": {
+			"type": "string",
+			"metadata": {
+				"description": "Name of your cluster - Between 3 and 23 characters. Letters and numbers only"
+			}
+		},
+		"adminUsername": {
+			"type": "string",
+			"metadata": {
+				"description": "Remote desktop user Id"
+			}
+		},
+		"adminPassword": {
+			"type": "securestring",
+			"metadata": {
+				"description": "Remote desktop user password. Must be a strong password"
+			}
+		},
+		"certificateThumbprint": {
+			"type": "string",
+			"metadata": {
+				"description": "Certificate Thumbprint"
+			}
+		},
+		"secretsObject": {
+			"type": "secureObject",
+			"metadata": {
+				"description": "Specifies all secrets {\"secretName\":\"\",\"secretValue\":\"\"} wrapped in a secure object."
+			}
+		}
+	},
+	"variables": {
+		"baseTemplateUrl": "https://storageworldvision.blob.core.windows.net/staging-temp-clean",
+		"nestedSQLServerTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'deploySqlServer.json')]",
+		"nestedHostingPlanTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'deployHostingPlan.json')]",
+		"nestedStorageAccountTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'deployStorageAccount.json')]",
+		"nestedWebSiteTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'deployWebSite.json')]",
+		"nestedKeyValutTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'deployKeyValut.json')]",
+		"nestedTrafficManagerTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'deployTrafficManager.json')]",
+		"nestedAPIManagementTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'deployAPIManagement.json')]",
+		"nestedServiceFabricTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'deployServiceFabric.json')]",
+		"apiVersion": "2017-05-10",
+		"contentVersion": "1.0.0.0",
+		"mode": "Incremental",
+		"sqlserverName": "[concat(parameters('environmentName'), '-sql-server')]",
+		"hostingPlanName": "[concat(parameters('environmentName'), '-hosting-plan-blue')]",
+		"webSiteName": "[concat(parameters('environmentName'), '-webapp-blue')]",
+		"trafficManagerName": "[concat(parameters('environmentName'), '-TM')]",
+		"resourceGroupWebapp": "[concat(parameters('environmentName'), '-Blue-RG')]",
+		"resourceGroupShared": "[concat(parameters('environmentName'), '-Shared-RG')]",
+		"storageAccountName": "chosenstagingstorage",
+		"containerName": "[concat(parameters('environmentName'), '-photo-container')]",
+		"ida:PostLogoutRedirectUri": "[concat('https://', variables('webSiteName'),'.azurewebsites.net')]",
+		"sqlServerTemplate": "sqlServerTemplate",
+		"hostingPlanTemplate": "hostingPlanTemplate",
+		"storageAccountTemplate": "storageAccountTemplate",
+		"webSiteTemplate": "webSiteTemplate",
+		"keyValutTemplate": "keyValutTemplate",
+		"trafficManagerTemplate": "trafficManagerTemplate",
+		"apiManagementTemplate": "apiManagementTemplate",
+		"serviceFabricTemplate": "serviceFabricTemplate",
+		"webappEndpoint": "BlueWebappEndpoint"
+	},
+	"resources": [
+		{
+			"apiVersion": "[variables('apiVersion')]",
+			"resourceGroup": "[variables('resourceGroupShared')]",
+			"name": "[variables('sqlServerTemplate')]",
+			"type": "Microsoft.Resources/deployments",
+			"properties": {
+				"mode": "[variables('mode')]",
+				"templateLink": {
+					"uri": "[variables('nestedSQLServerTemplateFile')]",
+					"contentVersion": "[variables('contentVersion')]"
+				},
+				"parameters": {
+					"administratorLogin": {
+						"value": "[parameters('administratorLogin')]"
+					},
+					"administratorLoginPassword": {
+						"value": "[parameters('administratorLoginPassword')]"
+					},
+					"sqlserverName": {
+						"value": "[variables('sqlserverName')]"
+					},
+					"databaseName": {
+						"value": "[parameters('databaseName')]"
+					}
+				}
+			}
+		},
+		{
+			"apiVersion": "[variables('apiVersion')]",
+			"resourceGroup": "[variables('resourceGroupWebapp')]",
+			"name": "[variables('hostingPlanTemplate')]",
+			"type": "Microsoft.Resources/deployments",
+			"properties": {
+				"mode": "[variables('mode')]",
+				"templateLink": {
+					"uri": "[variables('nestedHostingPlanTemplateFile')]",
+					"contentVersion": "[variables('contentVersion')]"
+				},
+				"parameters": {
+					"hostingPlanName": {
+						"value": "[variables('hostingPlanName')]"
+					}
+				}
+			}
+		},
+		{
+			"apiVersion": "[variables('apiVersion')]",
+			"resourceGroup": "[variables('resourceGroupShared')]",
+			"name": "[variables('storageAccountTemplate')]",
+			"type": "Microsoft.Resources/deployments",
+			"properties": {
+				"mode": "[variables('mode')]",
+				"templateLink": {
+					"uri": "[variables('nestedStorageAccountTemplateFile')]",
+					"contentVersion": "[variables('contentVersion')]"
+				},
+				"parameters": {
+					"storageAccountName": {
+						"value": "[variables('storageAccountName')]"
+					},
+					"containerName": {
+						"value": "[variables('containerName')]"
+					}
+				}
+			}
+		},
+		{
+			"apiVersion": "[variables('apiVersion')]",
+			"resourceGroup": "[variables('resourceGroupWebapp')]",
+			"name": "[variables('webSiteTemplate')]",
+			"type": "Microsoft.Resources/deployments",
+			"dependsOn": [
+				"[variables('hostingPlanTemplate')]",
+				"[variables('sqlServerTemplate')]",
+				"[variables('storageAccountTemplate')]"
+			],
+			"properties": {
+				"mode": "[variables('mode')]",
+				"templateLink": {
+					"uri": "[variables('nestedWebSiteTemplateFile')]",
+					"contentVersion": "[variables('contentVersion')]"
+				},
+				"parameters": {
+					"administratorLogin": {
+						"value": "[parameters('administratorLogin')]"
+					},
+					"administratorLoginPassword": {
+						"value": "[parameters('administratorLoginPassword')]"
+					},
+					"ida:AADInstance": {
+						"value": "[parameters('ida:AADInstance')]"
+					},
+					"ida:ClientId": {
+						"value": "[parameters('ida:ClientId')]"
+					},
+					"ida:Domain": {
+						"value": "[parameters('ida:Domain')]"
+					},
+					"ida:PostLogoutRedirectUri": {
+						"value": "[variables('ida:PostLogoutRedirectUri')]"
+					},
+					"ida:BankValidatorURL": {
+						"value": "[parameters('ida:BankValidatorURL')]"
+					},
+					"ida:BankValidatorKey": {
+						"value": "[parameters('ida:BankValidatorKey')]"
+					},
+					"sqlserverName": {
+						"value": "[variables('sqlserverName')]"
+					},
+					"databaseName": {
+						"value": "[parameters('databaseName')]"
+					},
+					"hostingPlanName": {
+						"value": "[variables('hostingPlanName')]"
+					},
+					"webSiteName": {
+						"value": "[variables('webSiteName')]"
+					},
+					"outputHostingPlanReference": {
+						"value": "[reference(variables('hostingPlanTemplate')).outputs.outputHostingPlanReference.value]"
+					},
+					"outputStorageAccountNameReference": {
+						"value": "[reference(variables('storageAccountTemplate')).outputs.outputStorageAccountNameReference.value]"
+					},
+					"outputStorageContainerNameReference": {
+						"value": "[reference(variables('storageAccountTemplate')).outputs.outputStorageContainerNameReference.value]"
+					},
+					"outputStorageAccountKeyReference": {
+						"value": "[reference(variables('storageAccountTemplate')).outputs.outputStorageAccountKeyReference.value]"
+					}
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "[variables('apiVersion')]",
+			"resourceGroup": "[variables('resourceGroupShared')]",
+			"name": "[variables('trafficManagerTemplate')]",
+			"dependsOn": [
+				"[variables('sqlServerTemplate')]",
+				"[variables('hostingPlanTemplate')]",
+				"[variables('storageAccountTemplate')]",
+				"[variables('webSiteTemplate')]"
+			],
+			"properties": {
+				"mode": "[variables('mode')]",
+				"templateLink": {
+					"uri": "[variables('nestedTrafficManagerTemplateFile')]",
+					"contentVersion": "[variables('contentVersion')]"
+				},
+				"parameters": {
+					"trafficManagerName": {
+						"value": "[variables('trafficManagerName')]"
+					},
+					"webSiteName": {
+						"Value": "[variables('webSiteName')]"
+					},
+					"trafficeManagerEndPointPriority": {
+						"value": 1
+					},
+					"resourceGroupWebapp": {
+						"value": "[variables('resourceGroupWebapp')]"
+					},
+					"webappEndpoint": {
+						"value": "[variables('webappEndpoint')]"
+					}
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "[variables('apiVersion')]",
+			"resourceGroup": "[variables('resourceGroupShared')]",
+			"name": "[variables('apiManagementTemplate')]",
+			"dependsOn": [],
+			"properties": {
+				"mode": "[variables('mode')]",
+				"templateLink": {
+					"uri": "[variables('nestedAPIManagementTemplateFile')]",
+					"contentVersion": "[variables('contentVersion')]"
+				},
+				"parameters": {
+					"publisherEmail": {
+						"value": "[parameters('publisherEmail')]"
+					},
+					"publisherName": {
+						"value": "[parameters('publisherName')]"
+					},
+					"openIdConnectClientSecret": {
+						"value": "[parameters('openIdConnectClientSecret')]"
+					}
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "[variables('apiVersion')]",
+			"resourceGroup": "[variables('resourceGroupShared')]",
+			"name": "[variables('serviceFabricTemplate')]",
+			"dependsOn": [],
+			"properties": {
+				"mode": "[variables('mode')]",
+				"templateLink": {
+					"uri": "[variables('nestedServiceFabricTemplateFile')]",
+					"contentVersion": "[variables('contentVersion')]"
+				},
+				"parameters": {
+					"clusterName": {
+						"value": "[parameters('clusterName')]"
+					},
+					"adminUsername": {
+						"value": "[parameters('adminUsername')]"
+					},
+					"adminPassword": {
+						"value": "[parameters('adminPassword')]"
+					},
+					"certificateThumbprint": {
+						"value": "[parameters('certificateThumbprint')]"
+					}
+				}
+			}
+		}
+	]
+}
