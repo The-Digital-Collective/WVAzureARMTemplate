@@ -20,7 +20,24 @@
 		"databaseName": {
 			"type": "string"
 		},
-		
+		"ida:AADInstance": {
+			"type": "string"
+		},
+		"ida:ClientId": {
+			"type": "string"
+		},
+		"ida:Domain": {
+			"type": "string"
+		},
+		"ida:PostLogoutRedirectUri": {
+			"type": "string"
+		},
+		"ida:BankValidatorURL": {
+			"type": "string"
+		},
+		"ida:BankValidatorKey": {
+			"type": "string"
+		},
 		"outputHostingPlanReference": {
 			"type": "string"
 		},
@@ -63,8 +80,27 @@
 							"type": "SQLAzure"
 						}
 					}
+				},
+				{
+					"name": "appsettings",
+					"type": "config",
+					"apiVersion": "2018-11-01",
+					"dependsOn": [
+						"[resourceId('Microsoft.Web/Sites/', parameters('webSiteName'))]"
+					],
+					"properties": {
+						"ida:AADInstance": "[parameters('ida:AADInstance')]",
+						"ida:ClientId": "[parameters('ida:ClientId')]",
+						"ida:Domain": "[parameters('ida:Domain')]",
+						"ida:PostLogoutRedirectUri": "[parameters('ida:PostLogoutRedirectUri')]",
+						"ida:TenantId": "[subscription().tenantId]",
+						"ida:BankValidatorURL": "[parameters('ida:BankValidatorURL')]",
+						"ida:BankValidatorKey": "[parameters('ida:BankValidatorKey')]",
+						"StorageAccountName": "[parameters('outputStorageAccountNameReference')]",
+						"StorageContainer": "[parameters('outputStorageContainerNameReference')]",
+						"StorageAccountKey": "[parameters('outputStorageAccountKeyReference')]"
+					}
 				}
-				
 			]
 		}
 	]

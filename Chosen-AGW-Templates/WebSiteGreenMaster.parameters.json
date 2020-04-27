@@ -17,15 +17,70 @@
 				},
 				"secretName": "PWD-Chosen-Staging-Secret"
 			}
-		
 		},
+		"ida:AADInstance": {
+			"reference": {
+				"keyVault": {
+					"id": "/subscriptions/b39db650-2ae6-4e43-98cd-2a21da688c6f/resourceGroups/KeyVault-RG/providers/Microsoft.KeyVault/vaults/KeyVault-WVUK"
+				},
+				"secretName": "Common-AADInstance-Digital-Collective"
+			}
+		},
+		"ida:ClientId": {
+			"reference": {
+				"keyVault": {
+					"id": "/subscriptions/b39db650-2ae6-4e43-98cd-2a21da688c6f/resourceGroups/KeyVault-RG/providers/Microsoft.KeyVault/vaults/KeyVault-WVUK"
+				},
+				"secretName": "Common-ClientId-Digital-Collective"
+			}
+		},
+		"ida:Domain": {
+			"reference": {
+				"keyVault": {
+					"id": "/subscriptions/b39db650-2ae6-4e43-98cd-2a21da688c6f/resourceGroups/KeyVault-RG/providers/Microsoft.KeyVault/vaults/KeyVault-WVUK"
+				},
+				"secretName": "Common-Domain-MS"
+			}
+		},
+		"ida:BankValidatorURL": {
+			"reference": {
+				"keyVault": {
+					"id": "/subscriptions/b39db650-2ae6-4e43-98cd-2a21da688c6f/resourceGroups/KeyVault-RG/providers/Microsoft.KeyVault/vaults/KeyVault-WVUK"
+				},
+				"secretName": "Common-BankValidatorURL-Digital-Collective"
+			}
+		},
+		"ida:BankValidatorKey": {
+			"reference": {
+				"keyVault": {
+					"id": "/subscriptions/b39db650-2ae6-4e43-98cd-2a21da688c6f/resourceGroups/KeyVault-RG/providers/Microsoft.KeyVault/vaults/KeyVault-WVUK"
+				},
+				"secretName": "Common-BankValidatorKey-Digital-Collective"
+			}
+		},
+		"frontendCertData": {
+			"reference": {
+				"keyVault": {
+					"id": "/subscriptions/b39db650-2ae6-4e43-98cd-2a21da688c6f/resourceGroups/KeyVault-RG/providers/Microsoft.KeyVault/vaults/KeyVault-WVUK"
+				},
+				"secretName": "certificateappgatway"
+			}
+		},
+	    "frontendCertPassword": {
+	      "reference": {
+					"keyVault": {
+						"id": "/subscriptions/b39db650-2ae6-4e43-98cd-2a21da688c6f/resourceGroups/KeyVault-RG/providers/Microsoft.KeyVault/vaults/KeyVault-WVUK"
+					},
+					"secretName": "appgatwaycertpwd"
+				}
+	    },
 		"environmentName": {
-			"value": "chosen-staging-poc"
+			"value": "chosen-staging-agw"
 		},
 		"databaseName": {
 			"value": "chosenstagingagwdb"
 		}
 		
 		
-    }
+        	}
 }

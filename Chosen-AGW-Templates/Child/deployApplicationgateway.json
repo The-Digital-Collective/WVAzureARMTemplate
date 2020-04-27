@@ -57,7 +57,7 @@
             
           "type":"string"
         },
-        "httpListeners":{
+        "httpListener":{
             
         "type":"string"
         },
@@ -68,13 +68,18 @@
         "backendHttpSettingsCollection":{
             "type":"string"
         },
-        "bluefqdn":{
-            "value":"[variables('bluefqdn')]"
-
+        
+        "frontendCertData": {
+            "type": "string",
+            "metadata": {
+              "description": "Base-64 encoded form of the .pfx file. This is the cert terminating on the Application Gateway."
+            }
         },
-        "greenfqdn":{
-            "value":"[variables('bluefqdn')]"
-
+          "frontendCertPassword": {
+            "type": "securestring",
+            "metadata": {
+              "description": "Password for .pfx certificate"
+         }
         }
 
     
@@ -83,7 +88,7 @@
         "vnetId": "[resourceId(parameters('resourceGroupShared'),'Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
         "publicIPRef": "[resourceId('Microsoft.Network/publicIPAddresses/', parameters('publicIpAddressName'))]",
         "subnetRef": "[concat(variables('vnetId'), '/subnets/', parameters('subnetName'))]",
-        "applicationGatewayId": "[resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName'))]",
+        "applicationGatewayId": "[resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName'))]"
 		
     },
     "resources": [
@@ -98,12 +103,22 @@
                 "[concat('Microsoft.Network/publicIPAddresses/', parameters('publicIpAddressName'))]"
             ],
             "tags": {},
+            
             "properties": {
                 "sku": {
                     "name": "[parameters('skuSize')]",
                     "tier": "[parameters('tier')]",
                     "capacity": "[parameters('capacity')]"
                 },
+                "sslCertificates": [
+                    {
+                      "name": "appGatewayFrontEndSslCert",
+                      "properties": {
+                        "data": "[parameters('frontendCertData')]",
+                        "password": "[parameters('frontendCertPassword')]"
+                      }
+                    }
+                  ],
                 "gatewayIPConfigurations": [
                     {
                         "name": "appGatewayIpConfig",
@@ -124,11 +139,18 @@
                         }
                     }
                 ],
+                
                 "frontendPorts": [
                     {
                         "name": "port_80",
                         "properties": {
                             "Port": 80
+                        }
+                    },
+                    {
+                        "name": "port_443",
+                        "properties": {
+                            "port": 443
                         }
                     }
                 ],
@@ -138,11 +160,9 @@
                         "properties": {
                             "backendAddresses": [
                                 {
-                                    "fqdn": "[parameters('bluefqdnname')]"
-                                },
-								{
-                                    "fqdn": "[parameters('greenfqdnname')]"
+                                    "fqdn": "[concat(parameters('webSiteName'), '.azurewebsites.net')]"
                                 }
+								
                                 
                             ]
                         }
@@ -152,15 +172,15 @@
                     {
                         "name": "[parameters('backendHttpSettingsCollection')]",
                         "properties": {
-                            "port": 80,
-                            "protocol": "Http",
-                            "cookieBasedAffinity": "Disabled",
+                            "port": 443,
+                            "protocol": "Https",
+                            "cookieBasedAffinity": "Enabled",
                             "connectionDraining": {
                                 "enabled": true,
                                 "drainTimeoutInSec": 60
                             },
-                            "hostName": "[concat(parameters('webSiteName'), '.azurewebsites.net')]",
-                            "pickHostNameFromBackendAddress": false,
+                            
+                            "pickHostNameFromBackendAddress": true,
                             "requestTimeout": 20
                         }
                         
@@ -168,7 +188,7 @@
                 ],
                 "httpListeners": [
                     {
-                        "name": "[parameters('httpListeners')]",
+                        "name": "[parameters('httpListener')]",
                         "properties": {
                             "frontendIPConfiguration": {
                                 "id": "[concat(variables('applicationGatewayId'), '/frontendIPConfigurations/appGwPublicFrontendIp')]"
@@ -176,8 +196,25 @@
                             "frontendPort": {
                                 "id": "[concat(variables('applicationGatewayId'), '/frontendPorts/port_80')]"
                             },
-                            "protocol": "Http",
-                        "sslCertificate": null
+                            "protocol": "Http"
+                        
+                        }
+                    },
+                    {
+                        "name": "httpslisner",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/frontendIPConfigurations/appGwPublicFrontendIp')]"
+                            },
+                            "frontendPort": {
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/frontendPorts/port_443')]"
+                            },
+                            "protocol": "Https",
+                            "sslCertificate": {
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/sslCertificates/appGatewayFrontEndSslCert')]"
+                            },
+                            "hostNames": [],
+                            "requireServerNameIndication": false
                         }
                     }
                 ],
@@ -185,21 +222,51 @@
                     {
                         "Name": "[parameters('requestRoutingRules')]",
                         "properties": {
-                            "RuleType": "Basic",
+                            "ruleType": "Basic",
                             "httpListener": {
-                                "id": "[concat(variables('applicationGatewayId'), '/httpListeners/', parameters('httpListeners'))]"
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/httpListeners/',parameters('httpListener'))]"
+                            },
+                            "redirectConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/redirectConfigurations/',parameters('backendAddressPools'))]"
+                            }
+                        }
+                    },
+                    {
+                        "name": "rule2",
+                        "properties": {
+                            "ruleType": "Basic",
+                            "httpListener": {
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/httpListeners/httpslisner')]"
                             },
                             "backendAddressPool": {
-                                "id": "[concat(variables('applicationGatewayId'), '/backendAddressPools/', parameters('backendAddressPools'))]"
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/backendAddressPools/',parameters('backendAddressPools'))]"
                             },
                             "backendHttpSettings": {
-                                "id": "[concat(variables('applicationGatewayId'), '/backendHttpSettingsCollection/',parameters('backendHttpSettingsCollection'))]"
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/backendHttpSettingsCollection/',parameters('backendHttpSettingsCollection'))]"
                             }
                         }
                     }
                 ],
+                "redirectConfigurations": [
+                    {
+                        "name": "[parameters('backendAddressPools')]",
+                        "properties": {
+                            "redirectType": "Permanent",
+                            "targetListener": {
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/httpListeners/httpslisner')]"
+                            },
+                            "includePath": true,
+                            "includeQueryString": true,
+                            "requestRoutingRules": [
+                                {
+                                    "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('applicationGatewayName')), '/requestRoutingRules/',parameters('requestRoutingRules'))]"
+                                }
+                            ]
+                        }
+                    }
+                ],
                 "enableHttp2": false,
-                "sslCertificates": [],
+                
                 "probes": []
             }
         },

@@ -58,8 +58,24 @@
 				"secretName": "Common-BankValidatorKey-Digital-Collective"
 			}
 		},
+		"frontendCertData": {
+			"reference": {
+				"keyVault": {
+					"id": "/subscriptions/b39db650-2ae6-4e43-98cd-2a21da688c6f/resourceGroups/KeyVault-RG/providers/Microsoft.KeyVault/vaults/KeyVault-WVUK"
+				},
+				"secretName": "certificateappgatway"
+			}
+		},
+	    "frontendCertPassword": {
+	      "reference": {
+					"keyVault": {
+						"id": "/subscriptions/b39db650-2ae6-4e43-98cd-2a21da688c6f/resourceGroups/KeyVault-RG/providers/Microsoft.KeyVault/vaults/KeyVault-WVUK"
+					},
+					"secretName": "appgatwaycertpwd"
+				}
+	    },
 		"environmentName": {
-			"value": "chosen-staging-poc"
+			"value": "chosen-staging-agw"
 		},
 		"databaseName": {
 			"value": "chosenstagingagwdb"
