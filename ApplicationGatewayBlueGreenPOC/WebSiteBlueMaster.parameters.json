@@ -2,22 +2,6 @@
 	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
 	"contentVersion": "1.0.0.0",
 	"parameters": {
-		"administratorLogin": {
-			"reference": {
-				"keyVault": {
-					"id": "/subscriptions/b39db650-2ae6-4e43-98cd-2a21da688c6f/resourceGroups/KeyVault-RG/providers/Microsoft.KeyVault/vaults/KeyVault-WVUK"
-				},
-				"secretName": "Login-Chosen-Staging-Secret"
-			}
-		},
-		"administratorLoginPassword": {
-			"reference": {
-				"keyVault": {
-					"id": "/subscriptions/b39db650-2ae6-4e43-98cd-2a21da688c6f/resourceGroups/KeyVault-RG/providers/Microsoft.KeyVault/vaults/KeyVault-WVUK"
-				},
-				"secretName": "PWD-Chosen-Staging-Secret"
-			}
-		},
 		"ida:AADInstance": {
 			"reference": {
 				"keyVault": {
@@ -31,7 +15,7 @@
 				"keyVault": {
 					"id": "/subscriptions/b39db650-2ae6-4e43-98cd-2a21da688c6f/resourceGroups/KeyVault-RG/providers/Microsoft.KeyVault/vaults/KeyVault-WVUK"
 				},
-				"secretName": "Common-ClientId-Digital-Collective"
+				"secretName": "Chosen-Staging-Blue-ClientID"
 			}
 		},
 		"ida:Domain": {
@@ -58,6 +42,9 @@
 				"secretName": "Common-BankValidatorKey-Digital-Collective"
 			}
 		},
+		"environmentName": {
+			"value": "chosen-staging-appgatway"
+		},
 		"frontendCertData": {
 			"reference": {
 				"keyVault": {
@@ -73,14 +60,6 @@
 					},
 					"secretName": "appgatwaycertpwd"
 				}
-	    },
-		"environmentName": {
-			"value": "chosen-staging-agw"
-		},
-		"databaseName": {
-			"value": "chosenstagingagwdb"
-		}
-		
-		
-        	}
+	    }
+	}
 }

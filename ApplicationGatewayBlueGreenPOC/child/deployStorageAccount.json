@@ -1,0 +1,66 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"storageAccountName": {
+			"type": "string",
+			"metadata": {
+				"description": "Specifies the name of the Azure Storage account."
+			}
+		},
+		"containerName": {
+			"type": "string",
+			"metadata": {
+				"description": "Specifies the name of the blob container."
+			}
+		}
+	},
+	"variables": {
+		
+	},
+	"resources": [
+		{
+			"type": "Microsoft.Storage/storageAccounts",
+			"apiVersion": "2018-02-01",
+			"name": "[parameters('storageAccountName')]",
+			"location": "[resourceGroup().location]",
+			"tags": {
+				"displayName": "[parameters('storageAccountName')]"
+			},
+			"sku": {
+				"name": "Standard_LRS"
+			},
+			"kind": "StorageV2",
+			"properties": {
+				
+			},
+			"resources": [
+				{
+					"type": "blobServices/containers",
+					"apiVersion": "2018-03-01-preview",
+					"name": "[concat('default/', parameters('containerName'))]",
+					"dependsOn": [
+						"[parameters('storageAccountName')]"
+					],
+					"properties": {
+						"publicAccess": "None"
+					}
+				}
+			]
+		}
+	],
+	"outputs": {
+		"outputStorageAccountNameReference": {
+			"type": "string",
+			"value": "[parameters('storageAccountName')]"
+		},
+		"outputStorageContainerNameReference": {
+			"type": "string",
+			"value": "[parameters('containerName')]"
+		},
+		"outputStorageAccountKeyReference": {
+			"type": "string",
+			"value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]"
+		}
+	}
+}

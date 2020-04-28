@@ -28,6 +28,12 @@
 		},
 		"databaseName": {
 			"type": "string"
+		},
+		"frontendCertData": {
+			"type": "string"
+		},
+		  "frontendCertPassword": {
+			"type": "securestring"
 		}
 		
 	
@@ -44,8 +50,8 @@
 		"contentVersion": "1.0.0.0",
 		"mode": "Incremental",
 		"sqlserverName": "[concat(parameters('environmentName'), '-sql-server')]",
-		"hostingPlanName": "[concat(parameters('environmentName'), '-hosting-plan-blue')]",
-		"webSiteName": "[concat(parameters('environmentName'), '-webapp-blue')]",
+		"hostingPlanName": "[concat(parameters('environmentName'), '-hosting-plan-green')]",
+		"webSiteName": "[concat(parameters('environmentName'), '-webapp-green')]",
 		"applicationGatewayname": "[concat(parameters('environmentName'), '-AGW')]",
 		"virtualNetworkName": "[concat(parameters('environmentName'), '-Vnet')]",
 		"publicIPAddressName": "[concat(parameters('environmentName'), '-PIP')]",
@@ -60,14 +66,14 @@
 		"storageAccountTemplate": "storageAccountTemplate",
 		"webSiteTemplate": "webSiteTemplate",
 		"applicationGatewayTemplate": "applicationGatewayTemplate",
-		"backendAddressPools":"[concat(parameters('environmentName'), '-Green')]",
-		"httpListeners":"[concat(parameters('environmentName'), '-Green')]",
-		"requestRoutingRules":"[concat(parameters('environmentName'), '-Green')]",
-		"backendHttpSettingsCollection":"[concat(parameters('environmentName'), '-Green')]",
+		"backendAddressPools":"appGatewayBackendPool",
+		"httpListener":"httpListener",
+		"requestRoutingRules":"rule1",
+		"backendHttpSettingsCollection":"HttpSettings",
 		"tier":"Standard_v2",
-		"skuSize":"Standard_v2",
-		"bluefqdn":"chosen-staging-agw-webapp-blue.azurewebsites.net",
-		"greenfqdn":"chosen-staging-agw-webapp-green.azurewebsites.net"
+		"skuSize":"Standard_v2"
+		
+		
 	},
 	"resources": [
 		{
@@ -189,6 +195,7 @@
 					"webSiteName": {
 						"value": "[variables('webSiteName')]"
 					},
+
 					"outputHostingPlanReference": {
 						"value": "[reference(variables('hostingPlanTemplate')).outputs.outputHostingPlanReference.value]"
 					},
@@ -249,8 +256,6 @@
 					"value": 2
 				},
 				
-				
-			
 				"virtualNetworkName": {
 					"value": "[variables('virtualNetworkName')]"
 				},
@@ -271,24 +276,22 @@
 				"backendAddressPools":{
 					"value":"[variables('backendAddressPools')]"
 				},
-				"httpListeners":{
-					"value":"[variables('httpListeners')]"
+				"httpListener":{
+					"value":"[variables('httpListener')]"
 				},
 				"requestRoutingRules":{
 					"value":"[variables('requestRoutingRules')]"
+				 },
+				 
+				"frontendCertData": {
+					"value": "[parameters('frontendCertData')]"
 				},
-				"bluefqdn":{
-					"value":"[variables('bluefqdn')]"
-
-				},
-				"greenfqdn":{
-					"value":"[variables('bluefqdn')]"
-
+				"frontendCertPassword": {
+					"value": "[parameters('frontendCertPassword')]"
 				}
+		
         		
-
-				
-				}
+			   }
 			}
 		}
 	]
