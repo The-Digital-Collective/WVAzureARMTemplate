@@ -28,56 +28,6 @@
 		},
 		"databaseName": {
 			"type": "string"
-		},
-		"publisherEmail": {
-			"type": "string",
-			"minLength": 1,
-			"metadata": {
-				"description": "The email address of the owner of the service"
-			}
-		},
-		"publisherName": {
-			"type": "string",
-			"minLength": 1,
-			"metadata": {
-				"description": "The name of the owner of the service"
-			}
-		},
-		"openIdConnectClientSecret": {
-			"type": "securestring",
-			"metadata": {
-				"description": "OpenId connect client secret."
-			}
-		},
-		"clusterName": {
-			"type": "string",
-			"metadata": {
-				"description": "Name of your cluster - Between 3 and 23 characters. Letters and numbers only"
-			}
-		},
-		"adminUsername": {
-			"type": "string",
-			"metadata": {
-				"description": "Remote desktop user Id"
-			}
-		},
-		"adminPassword": {
-			"type": "securestring",
-			"metadata": {
-				"description": "Remote desktop user password. Must be a strong password"
-			}
-		},
-		"certificateThumbprint": {
-			"type": "string",
-			"metadata": {
-				"description": "Certificate Thumbprint"
-			}
-		},
-		"secretsObject": {
-			"type": "secureObject",
-			"metadata": {
-				"description": "Specifies all secrets {\"secretName\":\"\",\"secretValue\":\"\"} wrapped in a secure object."
-			}
 		}
 	},
 	"variables": {
@@ -110,7 +60,15 @@
 		"trafficManagerTemplate": "trafficManagerTemplate",
 		"apiManagementTemplate": "apiManagementTemplate",
 		"serviceFabricTemplate": "serviceFabricTemplate",
-		"webappEndpoint": "BlueWebappEndpoint"
+		"webappEndpoint": "BlueWebappEndpoint",
+		
+		"publisherEmail": "venkatesh.anbazhagan@worldvision.org.uk",
+		"publisherName": "Venatesh Anbazhagan",
+		"openIdConnectClientSecret": "l@LlE?3_uiT7S5Cm1QHfW_E/_wy0EM]q",
+		"clusterName": "worldvisioncluster",
+		"adminUsername": "wvservicefabuser",
+		"adminPassword": "Servfab@1233456",
+		"certificateThumbprint": "37F501F280284F2DF73B170DDF49B461B7292C09"
 	},
 	"resources": [
 		{
@@ -297,13 +255,13 @@
 				},
 				"parameters": {
 					"publisherEmail": {
-						"value": "[parameters('publisherEmail')]"
+						"value": "[variables('publisherEmail')]"
 					},
 					"publisherName": {
-						"value": "[parameters('publisherName')]"
+						"value": "[variables('publisherName')]"
 					},
 					"openIdConnectClientSecret": {
-						"value": "[parameters('openIdConnectClientSecret')]"
+						"value": "[variables('openIdConnectClientSecret')]"
 					}
 				}
 			}
@@ -322,16 +280,16 @@
 				},
 				"parameters": {
 					"clusterName": {
-						"value": "[parameters('clusterName')]"
+						"value": "[variables('clusterName')]"
 					},
 					"adminUsername": {
-						"value": "[parameters('adminUsername')]"
+						"value": "[variables('adminUsername')]"
 					},
 					"adminPassword": {
-						"value": "[parameters('adminPassword')]"
+						"value": "[variables('adminPassword')]"
 					},
 					"certificateThumbprint": {
-						"value": "[parameters('certificateThumbprint')]"
+						"value": "[variables('certificateThumbprint')]"
 					}
 				}
 			}

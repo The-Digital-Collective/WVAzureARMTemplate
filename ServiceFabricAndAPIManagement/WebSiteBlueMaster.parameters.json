@@ -63,41 +63,6 @@
 		},
 		"databaseName": {
 			"value": "chosenstagingdb"
-		},
-		"publisherEmail": {
-			"value": "venkatesh.anbazhagan@worldvision.org.uk"
-		},
-		"publisherName": {
-			"value": "sample"
-		},
-		"openIdConnectClientSecret": {
-			"value": "l@LlE?3_uiT7S5Cm1QHfW_E/_wy0EM]q"
-		},
-		"clusterName": {
-			"value": "samplecluster001"
-		},
-		"adminUsername": {
-			"value": "sampleservicefabuser"
-		},
-		"adminPassword": {
-			"value": "Servfab@1233456"
-		},
-		"certificateThumbprint": {
-			"value": "37F501F280284F2DF73B170DDF49B461B7292C09"
-		},
-		"secretsObject": {
-			"value": {
-				"secrets": [
-					{
-						"secretName": "exampleSecret1",
-						"secretValue": "secretVaule1"
-					},
-					{
-						"secretName": "exampleSecret2",
-						"secretValue": "secretValue2"
-					}
-				]
-			}
 		}
 	}
 }
