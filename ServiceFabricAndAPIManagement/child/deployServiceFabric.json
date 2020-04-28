@@ -85,20 +85,6 @@
 				"description": "Certificate Thumbprint"
 			}
 		},
-		"sourceVaultResourceId": {
-			"type": "string",
-			"defaultValue": "/subscriptions/b39db650-2ae6-4e43-98cd-2a21da688c6f/resourceGroups/chosen-staging-Shared-RG/providers/Microsoft.KeyVault/vaults/worldvisionSFKeyvalut",
-			"metadata": {
-				"description": "Resource Id of the key vault, is should be in the format of /subscriptions/<Sub ID>/resourceGroups/<Resource group name>/providers/Microsoft.KeyVault/vaults/<vault name>"
-			}
-		},
-		"certificateUrlValue": {
-			"type": "string",
-			"defaultValue":"https://worldvisionsfkeyvalut.vault.azure.net/secrets/servicefabtempcert/d4785fd8f0e54d1dbba54bc751d0aecb",
-			"metadata": {
-				"description": "Refers to the location URL in your key vault where the certificate was uploaded, it is should be in the format of https://<name of the vault>.vault.azure.net:443/secrets/<exact location>"
-			}
-		},
 		"clusterProtectionLevel": {
 			"type": "string",
 			"allowedValues": [
@@ -163,7 +149,9 @@
 		"lbHttpProbeID0": "[resourceId('Microsoft.Network/loadBalancers/probes', variables('lbName'), 'FabricHttpGatewayProbe')]",
 		"lbNatPoolID0": "[resourceId('Microsoft.Network/loadBalancers/inboundNatPools', variables('lbName'), 'LoadBalancerBEAddressNatPool')]",
 		"vmNodeType0Name": "[toLower(concat('NT1', variables('vmName')))]",
-		"vmNodeType0Size": "[parameters('nodeTypeSize')]"
+		"vmNodeType0Size": "[parameters('nodeTypeSize')]",
+		"certificateUrlValue": "https://worldvisionsfkeyvalut.vault.azure.net/secrets/servicefabtempcert/d4785fd8f0e54d1dbba54bc751d0aecb",
+		"sourceVaultResourceId": "/subscriptions/b39db650-2ae6-4e43-98cd-2a21da688c6f/resourceGroups/chosen-staging-Shared-RG/providers/Microsoft.KeyVault/vaults/worldvisionSFKeyvalut"
 	},
 	"resources": [
 		{
@@ -538,12 +526,12 @@
 						"secrets": [
 							{
 								"sourceVault": {
-									"id": "[parameters('sourceVaultResourceId')]"
+									"id": "[variables('sourceVaultResourceId')]"
 								},
 								"vaultCertificates": [
 									{
 										"certificateStore": "[parameters('certificateStoreValue')]",
-										"certificateUrl": "[parameters('certificateUrlValue')]"
+										"certificateUrl": "[variables('certificateUrlValue')]"
 									}
 								]
 							}
