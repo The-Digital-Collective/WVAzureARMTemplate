@@ -151,7 +151,7 @@
 		"vmNodeType0Name": "[toLower(concat('NT1', variables('vmName')))]",
 		"vmNodeType0Size": "[parameters('nodeTypeSize')]",
 		"certificateUrlValue": "https://worldvisionsfkeyvalut.vault.azure.net/secrets/servicefabtempcert/d4785fd8f0e54d1dbba54bc751d0aecb",
-		"sourceVaultResourceId": "/subscriptions/b39db650-2ae6-4e43-98cd-2a21da688c6f/resourceGroups/chosen-staging-Shared-RG/providers/Microsoft.KeyVault/vaults/worldvisionSFKeyvalut"
+		"sourceVaultResourceId": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/worldvisionSFKeyvalut"
 	},
 	"resources": [
 		{

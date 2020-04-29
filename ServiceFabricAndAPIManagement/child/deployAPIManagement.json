@@ -51,7 +51,7 @@
 	},
 	"variables": {
 		"apiManagementServiceName": "[concat('apimgmtservicetemplate', uniqueString(resourceGroup().id))]",
-		"serviceUrl": "https://example.net",
+		"serviceUrl": "http://worldvisionfabpoc.eastus.cloudapp.azure.com:8082/",
 		"apiName": "sampleApi",
 		"apiPath": "sampleapipath",
 		"OpenIdConnectProviderName": "sampleOpenIdConnectProvider",
@@ -135,7 +135,7 @@
 							"properties": {
 								"displayName": "GET resource",
 								"method": "[variables('operationName')]",
-								"urlTemplate": "/resource",
+								"urlTemplate": "/api/Values",
 								"description": "A demonstration of a GET call"
 							},
 							"resources": [
