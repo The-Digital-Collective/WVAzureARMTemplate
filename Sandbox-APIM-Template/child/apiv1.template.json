@@ -4,6 +4,12 @@
 	"parameters": {
 		"apiManagementServiceName": {
 			"type": "string"
+		},
+		"serviceUrl": {
+			"type": "string"
+		},
+		"contentValue": {
+			"type": "string"
 		}
 	},
 	"variables": {
@@ -19,9 +25,9 @@
 				"displayName": "HTTP Bin API",
 				"apiRevision": "1",
 				"description": "API Management facade for a very handy and free online HTTP tool",
-				"serviceUrl": "http://worldvisionfabpoc.eastus.cloudapp.azure.com:8082/",
+				"serviceUrl": "[parameters('serviceUrl')]",
 				"contentFormat": "openapi-link",
-				"contentValue": "http://worldvisionfabpoc.eastus.cloudapp.azure.com:8400/swagger/V2/swagger.json",
+				"contentValue": "[parameters('contentValue')]",
 				"path": "event",
 				"protocols": [
 					"https"

@@ -11,14 +11,19 @@ Param(
 )
 
 # The resource group that will contain the Key Vault to create to contain the Key Vault
-# $resourceGroupName = 'app-keyvalut-rg'
+ $resourceGroupName = 'chosen-sandbox-APIM-RG'
 
 # The name of the Key Vault to install
-# $keyVaultName = 'ContosoKV0112'
+  $keyVaultName = 'chosen-sandbox-keyvalut'
 
 # The Azure data center to install the Key Vault to
-# $location = 'East US'
+ $location = 'North Europe'
 
+$emailAddress = 'venkatesh.anbazhagan@worldvision.org.uk'
+
+$certificateName = 'worldvisioncert'
+
+$certSubjectName = 'CN=worldvision.com'
 
 # Create the Resource Group
 New-AzResourceGroup -Name $resourceGroupName -Location $location
