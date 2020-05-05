@@ -1,0 +1,161 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"environmentName": {
+			"type": "string"
+		}
+	},
+	"variables": {
+		"baseTemplateUrl": "https://storageworldvision.blob.core.windows.net/chosen-temp",
+		"nestedServiceFabricTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'servicefabric.template.json')]",
+		"apiVersion": "2017-05-10",
+		"contentVersion": "1.0.0.0",
+		"mode": "Incremental",
+		"location": "[resourceGroup().location]",
+		"clusterenv": "[replace(parameters('environmentName'), '-', '')]",
+		"clusterName": "[concat(variables('clusterenv'), 'cluster')]",
+		"adminUsername": "wvservicefabuser",
+		"adminPassword": "Servfab@1233456",
+		"certificateThumbprint": "4F8A1062E47C3560A3CF0938B21C0EF2E82FE11B",
+		"sourceVaultResourceId": "/subscriptions/b39db650-2ae6-4e43-98cd-2a21da688c6f/resourceGroups/chosen-sandbox-APIM-RG/providers/Microsoft.KeyVault/vaults/chosen-sandox-keyvault",
+		"certificateUrlValue": "https://chosen-sandox-keyvault.vault.azure.net/secrets/chosensandoxservicefabric/3be274e6bac54362a9f6153d47c465c9",
+		"vmName": "[concat(parameters('environmentName'), '-VM')]",
+		"virtualNetworkName": "[concat(parameters('environmentName'), '-VNet')]",
+		"addressPrefix": "10.0.0.0/16",
+		"nicName": "[concat(parameters('environmentName'), '-NIC')]",
+		"lbIPName": "[concat(parameters('environmentName'), '-PublicIP')]",
+		"nt0applicationStartPort": "20000",
+		"nt0applicationEndPort": "30000",
+		"nt0ephemeralStartPort": "49152",
+		"nt0ephemeralEndPort": "65534",
+		"nt0fabricTcpGatewayPort": "19000",
+		"nt0fabricHttpGatewayPort": "19080",
+		"subnet0Name": "[concat(parameters('environmentName'), '-Subnet-0')]",
+		"subnet0Prefix": "10.0.0.0/24",
+		"nodeTypeSize": "Standard_D2_v2",
+		"subnet0Ref": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', variables('virtualNetworkName'), variables('subnet0Name'))]",
+		"supportLogStorageAccountName": "[concat(variables('clusterenv'), 'splogs')]",
+		"applicationDiagnosticsStorageAccountName": "[concat(variables('clusterenv'), 'appdiglogs')]",
+		"lbName": "[concat(parameters('environmentName'), '-LoadBalancer')]",
+		"lbIPConfig0": "[resourceId('Microsoft.Network/loadBalancers/frontendIPConfigurations/', variables('lbName'), 'LoadBalancerIPConfig')]",
+		"lbPoolID0": "[resourceId('Microsoft.Network/loadBalancers/backendAddressPools', variables('lbName'), 'LoadBalancerBEAddressPool')]",
+		"lbProbeID0": "[resourceId('Microsoft.Network/loadBalancers/probes', variables('lbName'), 'FabricGatewayProbe')]",
+		"lbHttpProbeID0": "[resourceId('Microsoft.Network/loadBalancers/probes', variables('lbName'), 'FabricHttpGatewayProbe')]",
+		"lbNatPoolID0": "[resourceId('Microsoft.Network/loadBalancers/inboundNatPools', variables('lbName'), 'LoadBalancerBEAddressNatPool')]",
+		"vmNodeType0Name": "[toLower(concat('VM1', 'scale'))]"
+	},
+	"resources": [
+		{
+			"apiVersion": "[variables('apiVersion')]",
+			"name": "serviceFabricTemplate",
+			"type": "Microsoft.Resources/deployments",
+			"dependsOn": [],
+			"properties": {
+				"mode": "[variables('mode')]",
+				"templateLink": {
+					"uri": "[variables('nestedServiceFabricTemplateFile')]",
+					"contentVersion": "[variables('contentVersion')]"
+				},
+				"parameters": {
+					"clusterName": {
+						"value": "[variables('clusterName')]"
+					},
+					"adminUsername": {
+						"value": "[variables('adminUsername')]"
+					},
+					"adminPassword": {
+						"value": "[variables('adminPassword')]"
+					},
+					"certificateThumbprint": {
+						"value": "[variables('certificateThumbprint')]"
+					},
+					"sourceVaultResourceId": {
+						"value": "[variables('sourceVaultResourceId')]"
+					},
+					"certificateUrlValue": {
+						"value": "[variables('certificateUrlValue')]"
+					},
+					"location": {
+						"value": "[variables('location')]"
+					},
+					"vmName": {
+						"value": "[variables('vmName')]"
+					},
+					"virtualNetworkName": {
+						"value": "[variables('virtualNetworkName')]"
+					},
+					"addressPrefix": {
+						"value": "[variables('addressPrefix')]"
+					},
+					"nicName": {
+						"value": "[variables('nicName')]"
+					},
+					"lbIPName": {
+						"value": "[variables('lbIPName')]"
+					},
+					"nt0applicationStartPort": {
+						"value": "[variables('nt0applicationStartPort')]"
+					},
+					"nt0applicationEndPort": {
+						"value": "[variables('nt0applicationEndPort')]"
+					},
+					"nt0ephemeralStartPort": {
+						"value": "[variables('nt0ephemeralStartPort')]"
+					},
+					"nt0ephemeralEndPort": {
+						"value": "[variables('nt0ephemeralEndPort')]"
+					},
+					"nt0fabricTcpGatewayPort": {
+						"value": "[variables('nt0fabricTcpGatewayPort')]"
+					},
+					"nt0fabricHttpGatewayPort": {
+						"value": "[variables('nt0fabricHttpGatewayPort')]"
+					},
+					"subnet0Name": {
+						"value": "[variables('subnet0Name')]"
+					},
+					"subnet0Prefix": {
+						"value": "[variables('subnet0Prefix')]"
+					},
+					"subnet0Ref": {
+						"value": "[variables('subnet0Ref')]"
+					},
+					"supportLogStorageAccountName": {
+						"value": "[variables('supportLogStorageAccountName')]"
+					},
+					"applicationDiagnosticsStorageAccountName": {
+						"value": "[variables('applicationDiagnosticsStorageAccountName')]"
+					},
+					"lbName": {
+						"value": "[variables('lbName')]"
+					},
+					"lbIPConfig0": {
+						"value": "[variables('lbIPConfig0')]"
+					},
+					"lbPoolID0": {
+						"value": "[variables('lbPoolID0')]"
+					},
+					"lbProbeID0": {
+						"value": "[variables('lbProbeID0')]"
+					},
+					"lbHttpProbeID0": {
+						"value": "[variables('lbHttpProbeID0')]"
+					},
+					"lbNatPoolID0": {
+						"value": "[variables('lbNatPoolID0')]"
+					},
+					"nodeTypeSize": {
+						"value": "[variables('nodeTypeSize')]"
+					},
+					"vmNodeType0Name": {
+						"value": "[variables('vmNodeType0Name')]"
+					}
+				}
+			}
+		}
+	],
+	"outputs": {
+		
+	}
+}

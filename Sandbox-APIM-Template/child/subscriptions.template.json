@@ -1,0 +1,23 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"apiManagementServiceName": {
+			"type": "string"
+		}
+	},
+	"resources": [
+		{
+			"type": "Microsoft.ApiManagement/service/subscriptions",
+			"name": "[concat(parameters('apiManagementServiceName'), '/b39db650-2ae6-4e43-98cd-2a21da688c6f')]",
+			"apiVersion": "2018-01-01",
+			"scale": null,
+			"properties": {
+				"userId": "[resourceId('Microsoft.ApiManagement/service/users', parameters('apiManagementServiceName'), 'demo-testuser-wv')]",
+				"productId": "[resourceId('Microsoft.ApiManagement/service/products', parameters('apiManagementServiceName'), 'demoProduct')]",
+				"displayName": "Starter product subscription",
+				"state": "active"
+			}
+		}
+	]
+}

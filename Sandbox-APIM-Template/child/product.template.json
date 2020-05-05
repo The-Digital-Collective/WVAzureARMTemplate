@@ -1,0 +1,55 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"apiManagementServiceName": {
+			"type": "string"
+		}
+	},
+	"variables": {
+		
+	},
+	"resources": [
+		{
+			"type": "Microsoft.ApiManagement/service/products",
+			"name": "[concat(parameters('apiManagementServiceName'), '/demoProduct')]",
+			"apiVersion": "2018-01-01",
+			"scale": null,
+			"properties": {
+				"displayName": "Demo Product",
+				"description": "Include 3 APIs. Limited to 1 subscription per developer. Throttled at 3 calls per 10 second.",
+				"terms": null,
+				"subscriptionRequired": true,
+				"approvalRequired": true,
+				"subscriptionsLimit": 1,
+				"state": "published"
+			}
+		},
+		{
+			"type": "Microsoft.ApiManagement/service/products/policies",
+			"name": "[concat(parameters('apiManagementServiceName'), '/demoProduct/policy')]",
+			"apiVersion": "2018-01-01",
+			"properties": {
+				"policyContent": "<policies>\r\n  <inbound>\r\n <validate-jwt header-name=\"Token\" failed-validation-httpcode=\"401\" failed-validation-error-message=\"Unauthorized\">\r\n   <issuer-signing-keys>\r\n  <key>c2VydmljZWZhYnJpY3NlY3JldGtleQ==</key>\r\n  </issuer-signing-keys>\r\n </validate-jwt>\r\n  <base />\r\n  </inbound>\r\n  <backend>\r\n    <base />\r\n  </backend>\r\n  <outbound>\r\n    <base />\r\n  </outbound>\r\n  <on-error>\r\n    <base />\r\n  </on-error>\r\n</policies>"
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.ApiManagement/service/products', parameters('apiManagementServiceName'), 'demoProduct')]"
+			]
+		},
+		{
+			"type": "Microsoft.ApiManagement/service/products/groups",
+			"name": "[concat(parameters('apiManagementServiceName'), '/demoProduct/wvgroups')]",
+			"apiVersion": "2017-03-01",
+			"scale": null,
+			"properties": {
+				
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.ApiManagement/service/products', parameters('apiManagementServiceName'), 'demoProduct')]"
+			]
+		}
+	],
+	"outputs": {
+		
+	}
+}

@@ -1,0 +1,203 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"environmentName": {
+			"type": "string"
+		}
+	},
+	"variables": {
+		"baseTemplateUrl": "https://storageworldvision.blob.core.windows.net/chosen-temp",
+		"nestedServiceTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'apimanagement.template.json')]",
+		"nestedUserTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'user.template.json')]",
+		"nestedGroupsTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'groups.template.json')]",
+		"nestedProductTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'product.template.json')]",
+		"nestedGroupsUsersTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'groupsUsers.template.json')]",
+		"nestedAPIVersionTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'apiversion.template.json')]",
+		"nestedhttpBinV1TemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'apiv1.template.json')]",
+		"nestedhttpBinV2TemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'apiv2.template.json')]",
+		"apiVersion": "2017-05-10",
+		"contentVersion": "1.0.0.0",
+		"mode": "Incremental",
+		"apiManagementServiceName": "[concat(parameters('environmentName'), '-APIManagement')]",
+		"location": "[resourceGroup().location]",
+		"publisherEmail": "venkatesh.anbazhagan@worldvision.org.uk",
+		"publisherName": "Venatesh Anbazhagan"
+	},
+	"resources": [
+		{
+			"apiVersion": "[variables('apiVersion')]",
+			"name": "serviceTemplate",
+			"type": "Microsoft.Resources/deployments",
+			"properties": {
+				"mode": "[variables('mode')]",
+				"templateLink": {
+					"uri": "[variables('nestedServiceTemplateFile')]",
+					"contentVersion": "[variables('contentVersion')]"
+				},
+				"parameters": {
+					"apiManagementServiceName": {
+						"value": "[variables('apiManagementServiceName')]"
+					},
+					"publisherName": {
+						"value": "[variables('publisherName')]"
+					},
+					"publisherEmail": {
+						"value": "[variables('publisherEmail')]"
+					},
+					"location": {
+						"value": "[variables('location')]"
+					}
+				}
+			}
+		},
+		{
+			"apiVersion": "[variables('apiVersion')]",
+			"name": "usersTemplate",
+			"type": "Microsoft.Resources/deployments",
+			"properties": {
+				"mode": "[variables('mode')]",
+				"templateLink": {
+					"uri": "[variables('nestedUserTemplateFile')]",
+					"contentVersion": "[variables('contentVersion')]"
+				},
+				"parameters": {
+					"apiManagementServiceName": {
+						"value": "[variables('apiManagementServiceName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'serviceTemplate')]"
+			]
+		},
+		{
+			"apiVersion": "[variables('apiVersion')]",
+			"name": "groupsTemplate",
+			"type": "Microsoft.Resources/deployments",
+			"properties": {
+				"mode": "[variables('mode')]",
+				"templateLink": {
+					"uri": "[variables('nestedGroupsTemplateFile')]",
+					"contentVersion": "[variables('contentVersion')]"
+				},
+				"parameters": {
+					"apiManagementServiceName": {
+						"value": "[variables('apiManagementServiceName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'serviceTemplate')]"
+			]
+		},
+		{
+			"apiVersion": "[variables('apiVersion')]",
+			"name": "productStarterTemplate",
+			"type": "Microsoft.Resources/deployments",
+			"properties": {
+				"mode": "[variables('mode')]",
+				"templateLink": {
+					"uri": "[variables('nestedProductTemplateFile')]",
+					"contentVersion": "[variables('contentVersion')]"
+				},
+				"parameters": {
+					"apiManagementServiceName": {
+						"value": "[variables('apiManagementServiceName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'serviceTemplate')]",
+				"[resourceId('Microsoft.Resources/deployments', 'groupsTemplate')]"
+			]
+		},
+		{
+			"apiVersion": "[variables('apiVersion')]",
+			"name": "groupsUsersTemplate",
+			"type": "Microsoft.Resources/deployments",
+			"properties": {
+				"mode": "Incremental",
+				"templateLink": {
+					"uri": "[variables('nestedGroupsUsersTemplateFile')]",
+					"contentVersion": "[variables('contentVersion')]"
+				},
+				"parameters": {
+					"apiManagementServiceName": {
+						"value": "[variables('apiManagementServiceName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'groupsTemplate')]",
+				"[resourceId('Microsoft.Resources/deployments', 'usersTemplate')]"
+			]
+		},
+		{
+			"apiVersion": "[variables('apiVersion')]",
+			"name": "httpBinVersionSetTemplate",
+			"type": "Microsoft.Resources/deployments",
+			"properties": {
+				"mode": "Incremental",
+				"templateLink": {
+					"uri": "[variables('nestedAPIVersionTemplateFile')]",
+					"contentVersion": "[variables('contentVersion')]"
+				},
+				"parameters": {
+					"apiManagementServiceName": {
+						"value": "[variables('apiManagementServiceName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'serviceTemplate')]"
+			]
+		},
+		{
+			"apiVersion": "[variables('apiVersion')]",
+			"name": "httpBinV1Template",
+			"type": "Microsoft.Resources/deployments",
+			"properties": {
+				"mode": "Incremental",
+				"templateLink": {
+					"uri": "[variables('nestedhttpBinV1TemplateFile')]",
+					"contentVersion": "[variables('contentVersion')]"
+				},
+				"parameters": {
+					"apiManagementServiceName": {
+						"value": "[variables('apiManagementServiceName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'productStarterTemplate')]",
+				"[resourceId('Microsoft.Resources/deployments', 'httpBinVersionSetTemplate')]"
+			]
+		},
+		{
+			"apiVersion": "[variables('apiVersion')]",
+			"name": "httpBinV2Template",
+			"type": "Microsoft.Resources/deployments",
+			"properties": {
+				"mode": "Incremental",
+				"templateLink": {
+					"uri": "[variables('nestedhttpBinV2TemplateFile')]",
+					"contentVersion": "[variables('contentVersion')]"
+				},
+				"parameters": {
+					"apiManagementServiceName": {
+						"value": "[variables('apiManagementServiceName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'productStarterTemplate')]",
+				"[resourceId('Microsoft.Resources/deployments', 'httpBinVersionSetTemplate')]",
+				"[resourceId('Microsoft.Resources/deployments', 'httpBinV1Template')]"
+			]
+		}
+	],
+	"outputs": {
+		
+	}
+}

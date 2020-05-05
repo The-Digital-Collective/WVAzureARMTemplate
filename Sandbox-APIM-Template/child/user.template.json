@@ -1,0 +1,25 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"apiManagementServiceName": {
+			"type": "string"
+		}
+	},
+	"resources": [
+		{
+			"type": "Microsoft.ApiManagement/service/users",
+			"name": "[concat(parameters('apiManagementServiceName'), '/demo-testuser-wv')]",
+			"apiVersion": "2018-01-01",
+			"scale": null,
+			"properties": {
+				"firstName": "DemoTest",
+				"lastName": "User",
+				"email": "demo.test.user@worldvision.org.uk",
+				"state": "active",
+				"note": "Internal consumer of our APIs",
+				"confirmation": "invite"
+			}
+		}
+	]
+}
