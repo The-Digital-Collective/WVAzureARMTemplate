@@ -4,6 +4,15 @@
 	"parameters": {
 		"environmentName": {
 			"value": "chosen-sandbox"
+		},
+		"GitHubFetcherWebServiceURI": {
+			"value": "https://gittokenapp.azurewebsites.net/api/gittokenapp"
+		},
+		"_GitHubLocation": {
+			"value": "https://raw.githubusercontent.com/The-Digital-Collective/WVAzureARMTemplate/master/Sandbox-APIM-Template/child"
+		},
+		"_GitHubAccessToken": {
+			"value": "c985eec4b567466a8b88c2921652e4cdc5311ca3"
 		}
 	}
 }

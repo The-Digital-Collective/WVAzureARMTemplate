@@ -4,19 +4,28 @@
 	"parameters": {
 		"environmentName": {
 			"type": "string"
+		},
+		"GitHubFetcherWebServiceURI": {
+			"type": "string"
+		},
+		"_GitHubLocation": {
+			"type": "string"
+		},
+		"_GitHubAccessToken": {
+			"type": "string"
 		}
 	},
 	"variables": {
-		"baseTemplateUrl": "https://storageworldvision.blob.core.windows.net/chosen-temp",
-		"nestedServiceTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'apimanagement.template.json')]",
-		"nestedUserTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'user.template.json')]",
-		"nestedGroupsTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'groups.template.json')]",
-		"nestedProductTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'product.template.json')]",
-		"nestedGroupsUsersTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'groupsUsers.template.json')]",
-		"nestedAPIVersionTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'apiversion.template.json')]",
-		"nestedhttpBinV1TemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'apiv1.template.json')]",
-		"nestedhttpBinV2TemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'apiv2.template.json')]",
-		"nestedServiceFabricTemplateFile": "[concat(variables('baseTemplateUrl'), '/', 'servicefabric.template.json')]",
+	
+		"nestedServiceTemplateFile": "[concat(parameters('GitHubFetcherWebServiceURI'), '?githuburi=', parameters('_GitHubLocation'), '/', 'apimanagement.template.json', '&githubaccesstoken=', parameters('_GitHubAccessToken'))]",
+		"nestedUserTemplateFile": "[concat(parameters('GitHubFetcherWebServiceURI'), '?githuburi=', parameters('_GitHubLocation'), '/', 'user.template.json', '&githubaccesstoken=', parameters('_GitHubAccessToken'))]",
+		"nestedGroupsTemplateFile": "[concat(parameters('GitHubFetcherWebServiceURI'), '?githuburi=', parameters('_GitHubLocation'), '/', 'groups.template.json', '&githubaccesstoken=', parameters('_GitHubAccessToken'))]",
+		"nestedProductTemplateFile": "[concat(parameters('GitHubFetcherWebServiceURI'), '?githuburi=', parameters('_GitHubLocation'), '/', 'product.template.json', '&githubaccesstoken=', parameters('_GitHubAccessToken'))]",
+		"nestedGroupsUsersTemplateFile": "[concat(parameters('GitHubFetcherWebServiceURI'), '?githuburi=', parameters('_GitHubLocation'), '/', 'groupsUsers.template.json', '&githubaccesstoken=', parameters('_GitHubAccessToken'))]",
+		"nestedAPIVersionTemplateFile": "[concat(parameters('GitHubFetcherWebServiceURI'), '?githuburi=', parameters('_GitHubLocation'), '/', 'apiversion.template.json', '&githubaccesstoken=', parameters('_GitHubAccessToken'))]",
+		"nestedhttpBinV1TemplateFile": "[concat(parameters('GitHubFetcherWebServiceURI'), '?githuburi=', parameters('_GitHubLocation'), '/', 'apiv1.template.json', '&githubaccesstoken=', parameters('_GitHubAccessToken'))]",
+		"nestedhttpBinV2TemplateFile": "[concat(parameters('GitHubFetcherWebServiceURI'), '?githuburi=', parameters('_GitHubLocation'), '/', 'apiv2.template.json', '&githubaccesstoken=', parameters('_GitHubAccessToken'))]",
+		"nestedServiceFabricTemplateFile": "[concat(parameters('GitHubFetcherWebServiceURI'), '?githuburi=', parameters('_GitHubLocation'), '/', 'apiv2.template.json', '&githubaccesstoken=', parameters('_GitHubAccessToken'))]",
 		"apiVersion": "2017-05-10",
 		"contentVersion": "1.0.0.0",
 		"mode": "Incremental",
