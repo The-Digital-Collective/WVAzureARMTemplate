@@ -89,7 +89,7 @@
 		},
 		{
 			"type": "Microsoft.ApiManagement/service/products/apis",
-			"name": "[concat(parameters('apiManagementServiceName'), '/starter/httpBinAPI')]",
+			"name": "[concat(parameters('apiManagementServiceName'), '/demoProduct/httpBinAPI')]",
 			"apiVersion": "2018-01-01",
 			"scale": null,
 			"properties": {
