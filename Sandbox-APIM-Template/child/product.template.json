@@ -27,9 +27,9 @@
 			}
 		},
 		{
-			"apiVersion": "2017-03-01",
 			"type": "apis",
-			"name": "[variables('apiName')]",
+			"name": "variables('apiName')",
+			"apiVersion": "2017-03-01",
 			"dependsOn": [
 				"[resourceId('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'))]",
 				"[resourceId('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'), '/apis/',variables('apiName'))]",
