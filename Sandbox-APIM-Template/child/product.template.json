@@ -7,12 +7,13 @@
 		}
 	},
 	"variables": {
-		
+		"apiName": "[concat(parameters('apiManagementServiceName'), '/httpBinAPI')]",
+		"productName": "[concat(parameters('apiManagementServiceName'), '/demoProduct')]"
 	},
 	"resources": [
 		{
 			"type": "Microsoft.ApiManagement/service/products",
-			"name": "[concat(parameters('apiManagementServiceName'), '/demoProduct')]",
+			"name": "variables('productName')",
 			"apiVersion": "2018-01-01",
 			"scale": null,
 			"properties": {
@@ -24,6 +25,16 @@
 				"subscriptionsLimit": 1,
 				"state": "published"
 			}
+		},
+		{
+			"apiVersion": "2017-03-01",
+			"type": "apis",
+			"name": "[variables('apiName')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'))]",
+				"[resourceId('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'), '/apis/',variables('apiName'))]",
+				"[resourceId('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'), '/products/',variables('productName'))]"
+			]
 		},
 		{
 			"type": "Microsoft.ApiManagement/service/products/policies",
