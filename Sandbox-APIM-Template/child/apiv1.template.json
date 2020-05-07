@@ -26,8 +26,8 @@
 				"apiRevision": "1",
 				"description": "API Management facade for a very handy and free online HTTP tool",
 				"serviceUrl": "[parameters('serviceUrl')]",
-				"contentFormat": "swagger-link-json",
-		   		"contentValue": "http://petstore.swagger.io/v2/swagger.json",
+				"contentFormat": "openapi-link",
+				"contentValue": "[parameters('contentValue')]",
 				"path": "event",
 				"protocols": [
 					"https"
