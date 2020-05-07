@@ -7,7 +7,7 @@
 		}
 	},
 	"variables": {
-		"apiName": "[concat(parameters('apiManagementServiceName'), '/httpBinAPI')]",
+		"apiName": "demoAPI",
 		"productName": "[concat(parameters('apiManagementServiceName'), '/demoProduct')]"
 	},
 	"resources": [
@@ -31,9 +31,9 @@
 			"name": "[variables('apiName')]",
 			"apiVersion": "2017-03-01",
 			"dependsOn": [
-				"[concat('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'))]",
-				"[concat('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'), '/apis/',variables('apiName'))]",
-				"[concat('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'), '/products/',variables('productName'))]"
+				"[resourceId('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'))]",
+				"[resourceId('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'), '/apis/',variables('apiName'))]",
+				"[resourceId('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'), '/products/',variables('productName'))]"
 			]
 		},
 		{
