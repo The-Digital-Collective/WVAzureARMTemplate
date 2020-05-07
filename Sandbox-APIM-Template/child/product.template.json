@@ -7,13 +7,12 @@
 		}
 	},
 	"variables": {
-		"apiName": "demoAPI",
-		"productName": "[concat(parameters('apiManagementServiceName'), '/demoProduct')]"
+		
 	},
 	"resources": [
 		{
 			"type": "Microsoft.ApiManagement/service/products",
-			"name": "[variables('productName')]",
+			"name": "[concat(parameters('apiManagementServiceName'), '/demoProduct')]",
 			"apiVersion": "2018-01-01",
 			"scale": null,
 			"properties": {
@@ -25,16 +24,6 @@
 				"subscriptionsLimit": 1,
 				"state": "published"
 			}
-		},
-		{
-			"type": "apis",
-			"name": "[variables('apiName')]",
-			"apiVersion": "2017-03-01",
-			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'))]",
-				"[resourceId('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'), '/apis/',variables('apiName'))]",
-				"[resourceId('Microsoft.ApiManagement/service/', variables('apiManagementServiceName'), '/products/',variables('productName'))]"
-			]
 		},
 		{
 			"type": "Microsoft.ApiManagement/service/products/policies",
