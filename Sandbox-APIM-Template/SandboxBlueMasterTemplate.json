@@ -31,7 +31,7 @@
 		"mode": "Incremental",
 		"apiManagementServiceName": "[concat(parameters('environmentName'), '-APIManagement')]",
 		"serviceUrl": "http://worldvisionfabpoc.eastus.cloudapp.azure.com:8082/",
-		"contentValue": "http://worldvisionfabpoc.eastus.cloudapp.azure.com:8400/swagger/V1/swagger.json",
+		"contentValue": "http://worldvisionfabpoc.eastus.cloudapp.azure.com:8400/swagger/V2/swagger.json",
 		"location": "[resourceGroup().location]",
 		"publisherEmail": "venkatesh.anbazhagan@worldvision.org.uk",
 		"publisherName": "Venatesh Anbazhagan",
