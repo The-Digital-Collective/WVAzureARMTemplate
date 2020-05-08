@@ -7,13 +7,13 @@
 		}
 	},
 	"variables": {
-		
+		"apiVersion": "2018-01-01"
 	},
 	"resources": [
 		{
 			"type": "Microsoft.ApiManagement/service/products",
 			"name": "[concat(parameters('apiManagementServiceName'), '/demoProduct')]",
-			"apiVersion": "2018-01-01",
+			"apiVersion": "[variables('apiVersion')]",
 			"scale": null,
 			"properties": {
 				"displayName": "Demo Product",
@@ -28,7 +28,7 @@
 		{
 			"type": "Microsoft.ApiManagement/service/products/policies",
 			"name": "[concat(parameters('apiManagementServiceName'), '/demoProduct/policy')]",
-			"apiVersion": "2018-01-01",
+			"apiVersion": "[variables('apiVersion')]",
 			"properties": {
 				"policyContent": "<policies>\r\n  <inbound>\r\n <validate-jwt header-name=\"Token\" failed-validation-httpcode=\"401\" failed-validation-error-message=\"Unauthorized\">\r\n   <issuer-signing-keys>\r\n  <key>c2VydmljZWZhYnJpY3NlY3JldGtleQ==</key>\r\n  </issuer-signing-keys>\r\n </validate-jwt>\r\n  <base />\r\n  </inbound>\r\n  <backend>\r\n    <base />\r\n  </backend>\r\n  <outbound>\r\n    <base />\r\n  </outbound>\r\n  <on-error>\r\n    <base />\r\n  </on-error>\r\n</policies>"
 			},
@@ -39,7 +39,7 @@
 		{
 			"type": "Microsoft.ApiManagement/service/products/groups",
 			"name": "[concat(parameters('apiManagementServiceName'), '/demoProduct/wvgroups')]",
-			"apiVersion": "2017-03-01",
+			"apiVersion": "[variables('apiVersion')]",
 			"scale": null,
 			"properties": {
 				

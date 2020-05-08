@@ -13,16 +13,16 @@
 		}
 	},
 	"variables": {
-		
+		"apiVersion": "2018-01-01"
 	},
 	"resources": [
 		{
 			"type": "Microsoft.ApiManagement/service/apis",
-			"name": "[concat(parameters('apiManagementServiceName'), '/httpBinAPI')]",
-			"apiVersion": "2018-01-01",
+			"name": "[concat(parameters('apiManagementServiceName'), '/microserviceAPI')]",
+			"apiVersion": "[variables('apiVersion')]",
 			"scale": null,
 			"properties": {
-				"displayName": "HTTP Bin API",
+				"displayName": "Microservice API",
 				"apiRevision": "1",
 				"description": "API Management facade for a very handy and free online HTTP tool",
 				"serviceUrl": "[parameters('serviceUrl')]",
@@ -34,15 +34,13 @@
 				],
 				"subscriptionRequired": false,
 				"authenticationSettings": null,
-				"subscriptionKeyParameterNames": null,
-				"apiVersion": "v1",
-				"apiVersionSetId": "[concat(resourceId('Microsoft.ApiManagement/service', parameters('apiManagementServiceName')), '/api-version-sets/versionset-httpbin-api')]"
+				"subscriptionKeyParameterNames": null
 			}
 		},
 		{
 			"type": "Microsoft.ApiManagement/service/apis/operations",
-			"name": "[concat(parameters('apiManagementServiceName'), '/httpBinAPI/get')]",
-			"apiVersion": "2018-01-01",
+			"name": "[concat(parameters('apiManagementServiceName'), '/microserviceAPI/get')]",
+			"apiVersion": "[variables('apiVersion')]",
 			"scale": null,
 			"properties": {
 				"displayName": "Returns GET data.",
@@ -60,13 +58,13 @@
 				"policies": null
 			},
 			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiManagementServiceName'), 'httpBinAPI')]"
+				"[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiManagementServiceName'), 'microserviceAPI')]"
 			]
 		},
 		{
 			"type": "Microsoft.ApiManagement/service/apis/operations",
-			"name": "[concat(parameters('apiManagementServiceName'), '/httpBinAPI/post')]",
-			"apiVersion": "2018-01-01",
+			"name": "[concat(parameters('apiManagementServiceName'), '/microserviceAPI/post')]",
+			"apiVersion": "[variables('apiVersion')]",
 			"scale": null,
 			"properties": {
 				"displayName": "Returns POST data.",
@@ -84,29 +82,29 @@
 				"policies": null
 			},
 			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiManagementServiceName'), 'httpBinAPI')]"
+				"[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiManagementServiceName'), 'microserviceAPI')]"
 			]
 		},
 		{
 			"type": "Microsoft.ApiManagement/service/products/apis",
-			"name": "[concat(parameters('apiManagementServiceName'), '/demoProduct/httpBinAPI')]",
-			"apiVersion": "2018-01-01",
+			"name": "[concat(parameters('apiManagementServiceName'), '/demoProduct/microserviceAPI')]",
+			"apiVersion": "[variables('apiVersion')]",
 			"scale": null,
 			"properties": {
 				
 			},
 			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiManagementServiceName'), 'httpBinAPI')]"
+				"[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiManagementServiceName'), 'microserviceAPI')]"
 			]
 		},
 		{
 			"type": "Microsoft.ApiManagement/service/apis/policies",
-			"name": "[concat(parameters('apiManagementServiceName'), '/httpBinAPI/policy')]",
-			"apiVersion": "2018-01-01",
+			"name": "[concat(parameters('apiManagementServiceName'), '/microserviceAPI/policy')]",
+			"apiVersion": "[variables('apiVersion')]",
 			"properties": {
 			},
 			"dependsOn": [
-				"[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiManagementServiceName'), 'httpBinAPI')]"
+				"[resourceId('Microsoft.ApiManagement/service/apis', parameters('apiManagementServiceName'), 'microserviceAPI')]"
 			]
 		}
 	]

@@ -11,13 +11,13 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('apiManagementServiceName'), '/versionset-httpbin-api')]",
+			"name": "[concat(parameters('apiManagementServiceName'), '/microservice-api-version')]",
 			"type": "Microsoft.ApiManagement/service/api-version-sets",
 			"apiVersion": "2018-01-01",
 			"properties": {
-				"description": "Version set for HTTP bin API",
+				"description": "Version for Microservice API",
 				"versionQueryName": "api-version",
-				"displayName": "Versioned HTTP bin API",
+				"displayName": "Microservice API Version",
 				"versioningScheme": "query"
 			}
 		}
