@@ -23,7 +23,9 @@
 				"path": "httpbin",
 				"protocols": [
 					"https"
-				]
+				],
+				"apiVersion": "v2",
+				"apiVersionSetId": "[concat(resourceId('Microsoft.ApiManagement/service', parameters('apiManagementServiceName')), '/api-version-sets/versionset-httpbin-api')]"
 			}
 		},
 		{
